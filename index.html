@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#060810">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MathLab">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E">
@@ -1507,9 +1507,24 @@
                     console.error("❌ Error en prompt PWA:", e);
                 }
             } else {
-                console.warn("⚠️ PWA: Instalación automática no disponible.");
+                console.warn("⚠️ PWA: Instalación automática no disponible. Descargando instrucciones...");
+                const instructions = "GUÍA DE INSTALACIÓN ANDROID (PWA)\n" +
+                    "===================================\n\n" +
+                    "Para instalar MathLab como una aplicación nativa en tu móvil:\n\n" +
+                    "1. Abre el navegador (Chrome).\n" +
+                    "2. Pulsa los 3 puntos (menú superior derecho).\n" +
+                    "3. Busca la opción 'Instalar aplicación' o 'Añadir a la pantalla de inicio'.\n" +
+                    "4. Confirma la instalación.\n\n" +
+                    "¡Listo! MathLab aparecerá en tu escritorio sin barras de navegación.";
+                
+                const blob = new Blob([instructions], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'Instrucciones_PWA_Android.txt';
+                a.click();
+                
                 if(errDiv) {
-                    errDiv.innerText = "Tu navegador no permite la instalación automática. Por favor, usa la opción del menú: Añadir a pantalla de inicio";
+                    errDiv.innerText = "Instalación manual requerida: Revisa el archivo .txt descargado.";
                     errDiv.classList.remove('hidden');
                 }
             }
@@ -1769,15 +1784,19 @@
 
         // Calculator
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('calcin').addEventListener('input', e => {
-                const val = e.target.value.trim(), el = document.getElementById('calcout');
-                if (!val) { el.textContent = '—'; el.className = 'rval text-lg break-all text-base-400'; return; }
-                try {
-                    const r = math.evaluate(val);
-                    el.textContent = typeof r === 'function' ? '[Función]' : math.format(r, { precision: 14 });
-                    el.className = 'rval text-lg break-all text-neon font-mono';
-                } catch { el.textContent = 'Expresión no válida…'; el.className = 'rval text-lg break-all text-base-500'; }
-            });
+            const ci = document.getElementById('calcin');
+            if (ci) {
+                ci.addEventListener('input', e => {
+                    const val = e.target.value.trim(), el = document.getElementById('calcout');
+                    if (!el) return;
+                    if (!val) { el.textContent = '—'; el.className = 'rval text-lg break-all text-base-400'; return; }
+                    try {
+                        const r = math.evaluate(val);
+                        el.textContent = typeof r === 'function' ? '[Función]' : math.format(r, { precision: 14 });
+                        el.className = 'rval text-lg break-all text-neon font-mono';
+                    } catch { el.textContent = 'Expresión no válida…'; el.className = 'rval text-lg break-all text-base-500'; }
+                });
+            }
         });
 
         // ──────────────────────────────────────────────────────────
@@ -2604,65 +2623,11 @@
 
         window.addEventListener('load', () => setTimeout(analyze2D, 900));
 
-        // PWA Service Worker Estratégico (100% Offline & Stale-While-Revalidate)
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'mathlab-offline-v3.0';
-                
-                // Archivos críticos a retener en la instalación inicial (CDNs)
-                const PRECACHE = [
-                    './',
-                    'https://cdn.tailwindcss.com',
-                    'https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js',
-                    'https://cdn.plot.ly/plotly-2.27.0.min.js',
-                    'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
-                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js',
-                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js',
-                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js'
-                ];
-
-                self.addEventListener('install', e => {
-                    self.skipWaiting();
-                    e.waitUntil(
-                        caches.open(CACHE_NAME).then(cache => {
-                            return Promise.allSettled(
-                                PRECACHE.map(url => cache.add(new Request(url, { mode: 'no-cors' })))
-                            );
-                        })
-                    );
-                });
-
-                self.addEventListener('activate', e => {
-                    e.waitUntil(
-                        caches.keys().then(keys => Promise.all(
-                            keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-                        )).then(() => self.clients.claim())
-                    );
-                });
-
-                self.addEventListener('fetch', e => {
-                    const req = e.request;
-                    e.respondWith(
-                        caches.match(req).then(cachedRes => {
-                            const netFetch = fetch(req).then(netRes => {
-                                if (netRes && netRes.status === 200 && netRes.type !== 'error') {
-                                    const resClone = netRes.clone();
-                                    caches.open(CACHE_NAME).then(c => c.put(req, resClone));
-                                }
-                                return netRes;
-                            }).catch(() => null);
-                            
-                            // Stale-while-revalidate: devuelve caché de inmediato, actualiza en fondo.
-                            // Si no hay caché, espera al network.
-                            return cachedRes || netFetch;
-                        })
-                    );
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).then(() => {
-                console.log('✅ Service Worker listo. MathLab Pro es 100% Offline.');
-            });
+        // Service Worker (Estabilizado para GitHub Pages)
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+            // Nota: Para GitHub Pages se requiere un archivo físico sw.js en la raíz.
+            // Por ahora desactivamos la carga por blob para evitar errores de seguridad.
+            console.log('🌐 Protocolo seguro detectado. Listo para PWA con archivo físico.');
         }
     </script>
 </body>
