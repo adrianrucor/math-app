@@ -21,6 +21,15 @@
     <title>MathLab Suite — Cálculo Multivariable Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            if (typeof JSZip === 'undefined') {
+                console.error("❌ JSZip no cargó correctamente.");
+            } else {
+                console.log("✅ JSZip listo para usar.");
+            }
+        });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } };</script>
@@ -1339,7 +1348,7 @@
         </div>
 
         <!-- APP CENTER MODAL (DISTRIBUTION HUB) -->
-        <div id="appCenterModal" class="modal transition-opacity duration-300" style="backdrop-filter: blur(10px);" onclick="event.target===this ? this.style.display='none' : null">
+        <div id="appCenterModal" class="modal transition-opacity duration-300" style="backdrop-filter: blur(10px); z-index: 9999;" onclick="event.target===this ? this.style.display='none' : null">
             <div class="modal-content !max-w-2xl !bg-[#04060E]/95 !border-[#1A2236] shadow-[0_0_50px_rgba(0,245,160,0.1)] rounded-2xl overflow-hidden" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-6 border-b border-base-700/50 pb-4">
                     <div class="font-mono font-bold text-neon text-lg flex items-center gap-3 tracking-[0.2em]">
@@ -1368,6 +1377,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Descargar ZIP (.bat)
                         </button>
+                        <div id="win-error" class="hidden text-red-500 text-[10px] mt-2 font-mono"></div>
                     </div>
 
                     <!-- Android Solution -->
@@ -1387,6 +1397,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Instalar Ahora (Nativo)
                             </button>
+                            <div id="pwa-error" class="hidden text-red-400 text-[10px] mt-1 font-mono leading-tight"></div>
                             <button id="android-alt-btn" onclick="downloadAndroidInstaller()" class="w-full py-2 text-base-500 hover:text-white text-[0.65rem] font-mono transition-colors">
                                 ¿No funciona? Descargar Instalador (.html)
                             </button>
@@ -1456,121 +1467,102 @@
         const mj = async el => { if (window.MathJax && MathJax.typesetPromise) await MathJax.typesetPromise([el]) };
 
         // ──────────────────────────────────────────────────────────
-        // APP CENTER LOGIC & ROBUST DISTRIBUTION HUB
+        // APP CENTER LOGIC & FAILSAFE DISTRIBUTION
         // ──────────────────────────────────────────────────────────
         let deferredPrompt = null;
 
-        // Capturar evento de instalación PWA (Obligatorio)
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log("🛠 PWA: Evento 'beforeinstallprompt' capturado.");
+            console.log("🛠 PWA: Evento capturado y guardado en deferredPrompt.");
             e.preventDefault();
             deferredPrompt = e;
             const fab = document.getElementById('fabInstall');
-            if(fab) {
-                fab.style.display = 'flex';
-                fab.onclick = triggerInstall;
-            }
+            if(fab) { fab.style.display = 'flex'; fab.onclick = triggerInstall; }
         });
 
         window.addEventListener('appinstalled', () => {
-            console.log("✅ PWA: Aplicación instalada con éxito.");
+            console.log("✅ PWA: Sistema instalado.");
             deferredPrompt = null;
             const fab = document.getElementById('fabInstall');
             if(fab) fab.style.display = 'none';
         });
 
         function openAppCenter() {
-            console.log("📂 Abriendo Centro de App.");
+            console.log("📂 Botón pulsado: Abrir Centro de App");
             document.getElementById('appCenterModal').style.display = 'flex';
         }
 
         async function triggerInstall() {
-            console.log("📲 Iniciando proceso de instalación...");
+            console.log("📲 Botón pulsado: Instalación PWA");
             const btn = document.getElementById('pwa-install-btn');
-            const origText = btn ? btn.innerText : "";
+            const errDiv = document.getElementById('pwa-error');
+            if(errDiv) errDiv.classList.add('hidden');
 
             if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`📊 PWA: El usuario respondió con: ${outcome}`);
-                if (outcome === 'accepted') {
-                    const fab = document.getElementById('fabInstall');
-                    if(fab) fab.style.display = 'none';
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`📊 PWA: Resultado del prompt: ${outcome}`);
+                    deferredPrompt = null;
+                } catch (e) {
+                    console.error("❌ Error en prompt PWA:", e);
                 }
-                deferredPrompt = null;
             } else {
-                console.warn("⚠️ PWA: deferredPrompt es nulo.");
-                const msg = "Para instalar, usa el menú de tu navegador -> Añadir a pantalla de inicio";
-                alert(msg);
-                if(btn) {
-                    btn.innerText = "Sigue Instrucciones ☝️";
-                    btn.classList.replace('bg-gradient-to-r', 'bg-base-700');
-                    setTimeout(() => { if(btn) { btn.innerText = origText; btn.classList.replace('bg-base-700', 'bg-gradient-to-r'); } }, 5000);
+                console.warn("⚠️ PWA: Instalación automática no disponible.");
+                if(errDiv) {
+                    errDiv.innerText = "Tu navegador no permite la instalación automática. Por favor, usa la opción del menú: Añadir a pantalla de inicio";
+                    errDiv.classList.remove('hidden');
                 }
             }
         }
 
         async function downloadWindowsBundle() {
+            console.log("🖥 Botón pulsado: Windows ZIP");
             const btn = document.getElementById('win-btn');
+            const errDiv = document.getElementById('win-error');
             const origHTML = btn ? btn.innerHTML : "";
             
-            console.log("🖥 [Windows] Iniciando proceso de empaquetado...");
-            if(btn) {
-                btn.innerHTML = '<span class="spin"></span> Generando...';
-                btn.style.opacity = "0.7";
-            }
+            if(errDiv) errDiv.classList.add('hidden');
+            if(btn) { btn.innerHTML = '<span class="spin"></span> Generando...'; btn.style.opacity = "0.7"; }
 
             try {
-                if (typeof JSZip === 'undefined') throw new Error("JSZip no está cargado");
+                if (typeof JSZip === 'undefined') throw new Error("Librería de compresión (JSZip) no cargada.");
 
-                console.log("📦 [Windows] Instanciando motor JSZip...");
                 const zip = new JSZip();
                 
-                console.log("📄 [Windows] Inyectando index.html...");
-                const fullHTML = document.documentElement.outerHTML;
-                zip.file("index.html", '<!DOCTYPE html>\n' + fullHTML);
+                // 1. Snapshot del HTML actual (OuterHTML)
+                console.log("📄 Generando snapshot de la aplicación...");
+                const currentContent = document.documentElement.outerHTML;
+                zip.file("index.html", "<!DOCTYPE html>\n" + currentContent);
                 
-                console.log("⚙️ [Windows] Creando archivo .bat interactivo...");
-                const batContent = `@echo off\n echo Iniciando MathLab Pro...\n start msedge --app="file:///%cd%/index.html" || start chrome --app="file:///%cd%/index.html"\n exit`;
+                // 2. Archivo .bat robusto
+                console.log("⚙️ Creando lanzador .bat...");
+                const batContent = `@echo off & start msedge --app="%~dp0index.html"`;
                 zip.file("Iniciar_MathLab.bat", batContent);
                 
-                console.log("🎨 [Windows] Generando recursos gráficos (SVG)...");
+                // 3. Icono
                 const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="115" fill="#04060E"/><path d="M 280 110 C 350 110, 310 160, 280 200 C 230 270, 200 370, 200 410 C 200 450, 160 450, 150 410 C 130 330, 200 230, 240 160 C 260 120, 240 110, 280 110 Z" fill="#00F5A0"/></svg>`;
                 zip.file("icon.svg", logoSvg);
                 
-                console.log("💿 [Windows] Finalizando compresión del paquete...");
+                console.log("💿 Compimiendo paquete...");
                 const content = await zip.generateAsync({ type: "blob" });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(content);
-                a.download = 'MathLab_Pro_Windows.zip';
+                a.download = 'MathLab_Bundle_Windows.zip';
                 a.click();
-                console.log("✨ [Windows] ¡ZIP descargado con éxito!");
+                console.log("✨ ZIP generado y descargado.");
             } catch(e) {
-                console.error("❌ [Windows] Error crítico en ZIP:", e.message);
-                console.log("🔄 [Windows] Activando descarga de emergencia (.html portable)...");
-                
-                // Fallback: Descarga simple del HTML si JSZip falla
-                const fullHTML = document.documentElement.outerHTML;
-                const blob = new Blob(['<!DOCTYPE html>\n' + fullHTML], { type: 'text/html' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'MathLab_Emergency_Portable.html';
-                a.click();
-                alert("Hubo un problema creando el ZIP, se ha descargado una versión portable .html de emergencia.");
-            }
-            
-            if(btn) {
-                btn.innerHTML = origHTML;
-                btn.style.opacity = "1";
+                console.error("❌ Error en descarga Windows:", e);
+                if(errDiv) {
+                    errDiv.innerText = "Error técnico: " + e.message;
+                    errDiv.classList.remove('hidden');
+                }
+            } finally {
+                if(btn) { btn.innerHTML = origHTML; btn.style.opacity = "1"; }
             }
         }
 
         function downloadAndroidInstaller() {
-            console.log("📱 [Android] Generando instalador de instrucciones...");
-            const btn = document.getElementById('android-alt-btn');
-            const origText = btn ? btn.innerText : "";
-            if(btn) btn.innerText = "Preparando...";
-
+            console.log("📱 Botón pulsado: Android Fallback (.html)");
             const instructions = `
 <!DOCTYPE html>
 <html lang="es">
@@ -1607,8 +1599,7 @@
             a.href = URL.createObjectURL(blob);
             a.download = 'MathLab_Installer.apk.html';
             a.click();
-            console.log("✨ [Android] Instrucciones descargadas.");
-            if(btn) setTimeout(() => { btn.innerText = origText; }, 2000);
+            console.log("✨ Instrucciones móviles descargadas.");
         }
 
         // ──────────────────────────────────────────────────────────
