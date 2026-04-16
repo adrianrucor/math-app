@@ -5,24 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#060810">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MathLab">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E">
+    <script>
+        (function () {
+            const manifest = { "name": "MathLab Pro", "short_name": "MathLab", "display": "standalone", "orientation": "any", "background_color": "#04060E", "theme_color": "#080C18", "icons": [{ "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable" }] };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
+            document.head.appendChild(link);
+        })();
+    </script>
     <meta name="description" content="Suite avanzada de análisis matemático 2D/3D multivariable">
     <title>MathLab Suite — Cálculo Multivariable Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script>
-        window.addEventListener('load', () => {
-            if (typeof JSZip === 'undefined') {
-                console.error("❌ JSZip no cargó correctamente.");
-            } else {
-                console.log("✅ JSZip listo para usar.");
-            }
-        });
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } };</script>
@@ -163,7 +162,8 @@
             border: 1px solid #1A2236;
             color: #E2E8F0;
             font-family: 'Space Mono', monospace;
-            font-size: 16px; /* 16px mandatory to prevent auto-zoom in iOS/Android inputs */
+            font-size: 16px;
+            /* 16px mandatory to prevent auto-zoom in iOS/Android inputs */
             transition: all .2s;
             outline: none;
             border-radius: 8px
@@ -559,12 +559,12 @@
             </div>
             <div class="hidden md:flex items-center gap-4">
                 <div class="text-xs text-base-500 font-mono">math.js · plotly · mathjax</div>
-                <button id="getAppBtn" onclick="openAppCenter()"
+                <button onclick="openAppCenter()"
                     class="btnp px-3 py-1.5 text-[0.65rem] flex items-center gap-1.5 rounded-md">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    Obtener App
+                    APP CENTER
                 </button>
             </div>
         </div>
@@ -1340,79 +1340,94 @@
             </div>
         </div>
 
-        <!-- APP CENTER MODAL (DISTRIBUTION HUB) -->
-        <div id="appCenterModal" class="modal transition-opacity duration-300" style="backdrop-filter: blur(10px); z-index: 999999; position: fixed;" onclick="event.target===this ? this.style.display='none' : null">
-            <div class="modal-content !max-w-2xl !bg-[#04060E]/95 !border-[#1A2236] shadow-[0_0_50px_rgba(0,245,160,0.1)] rounded-2xl overflow-hidden" onclick="event.stopPropagation()">
+        <!-- APP CENTER MODAL -->
+        <div id="appCenterModal" class="modal transition-opacity duration-300" style="backdrop-filter: blur(8px);"
+            onclick="event.target===this ? this.style.display='none' : null">
+            <div class="modal-content !max-w-xl !bg-[#04060E]/90 !border-[#1A2236] shadow-[0_0_40px_rgba(0,245,160,0.1)] rounded-2xl overflow-hidden"
+                onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-6 border-b border-base-700/50 pb-4">
-                    <div class="font-mono font-bold text-neon text-lg flex items-center gap-3 tracking-[0.2em]">
+                    <div class="font-mono font-bold text-neon text-lg flex items-center gap-3 tracking-widest">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                            <rect x="9" y="9" width="6" height="6"></rect>
+                            <line x1="9" y1="1" x2="9" y2="4"></line>
                         </svg>
-                        DISTRIBUCIÓN
+                        APP CENTER
                     </div>
-                    <button class="text-base-400 hover:text-white transition-colors" onclick="document.getElementById('appCenterModal').style.display='none'">✕</button>
+                    <button class="text-base-400 hover:text-white transition-colors"
+                        onclick="document.getElementById('appCenterModal').style.display='none'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Windows Bundle -->
-                    <div class="p-6 rounded-2xl bg-[#080C18] border border-[#1A2236] hover:border-sky/50 transition-all group">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-sky/10 rounded-xl text-sky group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M0,0H11.37V11.37H0ZM12.62,0H24V11.37H12.62ZM0,12.62H11.37V24H0ZM12.62,12.62H24V24H12.62Z"></path></svg>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Windows Card -->
+                    <div
+                        class="p-5 rounded-xl bg-gradient-to-br from-[#0F1626] to-[#04060E] border border-[#1A2236] hover:border-sky transition-colors flex flex-col justify-between h-full group">
+                        <div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <svg class="w-8 h-8 text-sky group-hover:scale-110 transition-transform"
+                                    fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M0,0H11.37V11.37H0ZM12.62,0H24V11.37H12.62ZM0,12.62H11.37V24H0ZM12.62,12.62H24V24H12.62Z">
+                                    </path>
+                                </svg>
+                                <h3 class="font-bold text-white text-md">Windows (.exe)</h3>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-white text-md">Windows Desk</h3>
-                                <p class="text-[0.65rem] text-base-500 uppercase font-mono">Modo App Nativa</p>
-                            </div>
+                            <p class="text-xs text-base-400 mb-4 leading-relaxed">Descarga MathLab Pro empaquetado para
+                                escritorio. Incluye .bat autoejecutable sin bordes.</p>
                         </div>
-                        <p class="text-xs text-base-400 mb-6 leading-relaxed">Descarga MathLab Pro en un paquete ZIP con lanzador directo (.bat). Se abre como una ventana independiente sin interfaz de navegador.</p>
-                        <button id="win-btn" onclick="downloadWindowsBundle()" class="w-full py-3 bg-[#1A2236] hover:bg-sky text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Descargar ZIP (.bat)
+                        <button id="win-btn" onclick="downloadWindowsBundle()"
+                            class="w-full py-2.5 bg-[#1A2236] hover:bg-sky text-white font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Descargar ZIP
                         </button>
-                        <div id="win-error" class="hidden text-red-500 text-[10px] mt-2 font-mono"></div>
                     </div>
 
-                    <!-- Android Solution -->
-                    <div class="p-6 rounded-2xl bg-[#080C18] border border-[#1A2236] hover:border-neon/50 transition-all group">
-                        <div class="flex items-center gap-4 mb-4">
-                            <div class="p-3 bg-neon/10 rounded-xl text-neon group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <!-- Android Card -->
+                    <div
+                        class="p-5 rounded-xl bg-gradient-to-br from-[#0F1626] to-[#04060E] border border-[#1A2236] hover:border-neon transition-colors flex flex-col justify-between h-full group">
+                        <div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-3xl group-hover:scale-110 transition-transform">📱</span>
+                                <h3 class="font-bold text-white text-md">Android (.apk)</h3>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-white text-md">Android Mobile</h3>
-                                <p class="text-[0.65rem] text-base-500 uppercase font-mono">Instalador PWA</p>
-                            </div>
+                            <p class="text-xs text-base-400 mb-4 leading-relaxed">Obtén el paquete MathLab Android listo
+                                para instalarse o convertirse mediante herramientas de compilación móviles.</p>
                         </div>
-                        <p class="text-xs text-base-400 mb-6 leading-relaxed">Instala MathLab en tu móvil. Te permite usar la app offline y a pantalla completa. Si el instalador no abre, usa el botón "PWA Installer".</p>
-                        <div class="flex flex-col gap-2">
-                            <button id="pwa-install-btn" onclick="triggerInstall()" class="w-full py-3 bg-gradient-to-r from-[#00F5A0] to-[#00C67F] text-base-950 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Instalar Ahora (Nativo)
-                            </button>
-                            <div id="pwa-error" class="hidden text-red-400 text-[10px] mt-1 font-mono leading-tight"></div>
-                            <button id="android-alt-btn" onclick="downloadAndroidInstaller()" class="w-full py-2 text-base-500 hover:text-white text-[0.65rem] font-mono transition-colors">
-                                ¿No funciona? Descargar Instalador (.html)
-                            </button>
-                        </div>
+                        <button id="apk-btn" onclick="downloadAndroidBundle()"
+                            class="w-full py-2.5 bg-gradient-to-r from-[#00F5A0] to-[#00C67F] hover:scale-[1.02] text-base-950 font-bold rounded-lg text-sm transition-transform shadow-[0_4px_15px_rgba(0,245,160,0.2)] flex items-center justify-center gap-2">
+                            <span class="text-lg">🤖</span>
+                            Descargar Source (.APK)
+                        </button>
                     </div>
                 </div>
 
-                <div class="mt-8 p-4 rounded-xl bg-base-950/50 border border-base-800 flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-xs text-base-500">
-                        <span class="w-2 h-2 rounded-full bg-neon animate-pulse"></span>
-                        Optimizado para uso 100% Offline (Local Blobs)
+                <div
+                    class="mt-4 p-4 rounded-xl bg-base-900 border border-base-800 flex items-center justify-between text-xs text-base-400">
+                    <div class="flex items-center gap-2">
+                        <span class="text-neon text-lg">⚡</span>
+                        <span>Descargas PWA generadas en local por JS (100% Offline)</span>
                     </div>
-                    <span class="font-mono text-[0.6rem] text-base-600">MATHLAB SUITE V3.0 — BUILD 2026.04</span>
+                    <span class="font-mono bg-base-800 px-2 py-1 rounded">MathLab v3.0</span>
                 </div>
             </div>
         </div>
 
     </main>
-    
+
     <!-- PWA Install FAB -->
-    <button id="fabInstall" class="hidden fixed bottom-6 right-6 z-[99] bg-[#00F5A0] hover:bg-[#00C67F] text-[#04060E] p-4 rounded-full shadow-[0_4px_15px_rgba(0,245,160,0.5)] transition-transform hover:scale-110 items-center justify-center">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+    <button id="fabInstall"
+        class="hidden fixed bottom-6 right-6 z-[99] bg-[#00F5A0] hover:bg-[#00C67F] text-[#04060E] p-4 rounded-full shadow-[0_4px_15px_rgba(0,245,160,0.5)] transition-transform hover:scale-110 items-center justify-center">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
     </button>
 
     <footer class="text-center py-4 text-base-500 font-mono text-xs mt-4">MathLab Suite v3.0 — math.js · plotly.js ·
@@ -1439,7 +1454,7 @@
         math.import({
             pow: function (x, y) {
                 if (typeof x === 'number' && typeof y === 'number' && x < 0) {
-                    for(let q = 1; q <= 99; q += 2) {
+                    for (let q = 1; q <= 99; q += 2) {
                         const p = y * q;
                         if (Math.abs(Math.round(p) - p) < 1e-10) {
                             const res = Math.pow(-x, Math.abs(y));
@@ -1460,149 +1475,111 @@
         const mj = async el => { if (window.MathJax && MathJax.typesetPromise) await MathJax.typesetPromise([el]) };
 
         // ──────────────────────────────────────────────────────────
-        // APP CENTER LOGIC & FAILSAFE DISTRIBUTION
+        // APP CENTER LOGIC & PWA DYNAMICS
         // ──────────────────────────────────────────────────────────
-        let deferredPrompt = null;
+        let deferredPrompt;
 
+        // Detector nativo (Mantiene funcionando el FAB si entras desde Android/Chrome)
         window.addEventListener('beforeinstallprompt', (e) => {
-            console.log("🛠 PWA: Evento capturado y guardado en deferredPrompt.");
             e.preventDefault();
             deferredPrompt = e;
             const fab = document.getElementById('fabInstall');
-            if(fab) { fab.style.display = 'flex'; fab.onclick = triggerInstall; }
+            if (fab) {
+                fab.style.display = 'flex';
+                fab.onclick = triggerInstall;
+            }
         });
 
         window.addEventListener('appinstalled', () => {
-            console.log("✅ PWA: Sistema instalado.");
             deferredPrompt = null;
             const fab = document.getElementById('fabInstall');
-            if(fab) fab.style.display = 'none';
+            if (fab) fab.style.display = 'none';
         });
 
         function openAppCenter() {
-            console.log("📂 Botón pulsado: Abrir Centro de App");
             document.getElementById('appCenterModal').style.display = 'flex';
         }
 
-        async function triggerInstall() {
-            console.log("📲 Botón pulsado: Instalar PWA");
-            const btn = document.getElementById('pwa-install-btn');
-            const errDiv = document.getElementById('pwa-error');
-            if (errDiv) errDiv.classList.add('hidden');
+        async function downloadAndroidBundle() {
+            if (typeof JSZip === 'undefined') { alert("Conexión requerida para iniciar el empaquetador JS."); return; }
+            const btn = document.getElementById('apk-btn');
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="spin"></span> Empaquetando...';
 
+            try {
+                const zip = new JSZip();
+                const htmlStr = document.documentElement.outerHTML;
+                zip.file("MathLab.html", '<!DOCTYPE html>\\n<html lang="es" class="dark">\\n' + htmlStr.substring(htmlStr.indexOf('<head>')));
+
+                const manifest = { "name": "MathLab Pro", "short_name": "MathLab", "display": "standalone", "orientation": "any", "background_color": "#04060E", "theme_color": "#080C18", "icons": [{ "src": "icon.svg", "sizes": "512x512", "type": "image/svg+xml" }] };
+                zip.file("manifest.json", JSON.stringify(manifest, null, 2));
+
+                zip.file("Instrucciones_APK.txt", "MathLab Pro - ANDROID DEPLOYMENT\n===================================\nAl ser MathLab una aplicación web 100% Offline pura (Frontend), no se puede generar el binario firmado '.apk' directamente en tu disco sin intermediarios de Java.\n\nPara convertir esto en un '.apk' real:\n1. Ingresa a PWABuilder.com o usa la librería open-source @bubblewrap/cli (Google).\n2. Proporcionales la ruta de tu manifest.json o de un enlace si lo has subido a GitHub Pages.\n3. Te devolverán un .apk firmado listo para subir a la Play Store.");
+
+                const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="115" fill="#04060E"/><path d="M 280 110 C 350 110, 310 160, 280 200 C 230 270, 200 370, 200 410 C 200 450, 160 450, 150 410 C 130 330, 200 230, 240 160 C 260 120, 240 110, 280 110 Z" fill="#00F5A0"/></svg>`;
+                zip.file("icon.svg", logoSvg);
+
+                const blob = await zip.generateAsync({ type: "blob" });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MathLab_Android_PWA.zip'; a.click();
+            } catch (e) {
+                console.error(e);
+            }
+            btn.innerHTML = origHTML;
+        }
+
+        async function triggerInstall() {
             if (deferredPrompt) {
-                try {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`📊 PWA: Resultado del usuario: ${outcome}`);
-                    deferredPrompt = null;
-                } catch (e) {
-                    console.error("❌ Error en prompt PWA:", e);
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    isAppInstalled = true;
+                    updateAppCenterUI();
+                    const fab = document.getElementById('fabInstall');
+                    if (fab) fab.style.display = 'none';
                 }
-            } else {
-                console.warn("⚠️ PWA: Instalación automática no disponible.");
-                if (errDiv) {
-                    errDiv.innerHTML = `<div class="p-3 bg-base-800 rounded-xl border border-base-700/50 mt-2 shadow-inner">
-                        <p class="text-[0.7rem] text-gold mb-2 font-bold flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
-                            Instalación Manual Requerida:
-                        </p>
-                        <ol class="list-decimal list-inside text-[0.65rem] text-base-400 space-y-2 leading-relaxed">
-                            <li>Pulsa los <span class="text-white font-bold underline">3 puntos</span> del navegador.</li>
-                            <li>Selecciona <span class="text-white font-bold underline">"Añadir a pantalla de inicio"</span>.</li>
-                            <li>La App aparecerá en tu escritorio móvil.</li>
-                        </ol>
-                    </div>`;
-                    errDiv.classList.remove('hidden');
-                }
+                deferredPrompt = null;
             }
         }
 
         async function downloadWindowsBundle() {
-            console.log("🖥 Botón pulsado: Windows ZIP");
+            if (typeof JSZip === 'undefined') {
+                alert("La herramienta JSZip está cargando. Revisa tu conexión a internet para esta primera descarga.");
+                return;
+            }
             const btn = document.getElementById('win-btn');
-            const errDiv = document.getElementById('win-error');
-            const origHTML = btn ? btn.innerHTML : "";
-            
-            if(errDiv) errDiv.classList.add('hidden');
-            if(btn) { btn.innerHTML = '<span class="spin"></span> Generando...'; btn.style.opacity = "0.7"; }
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="spin"></span> Generando ZIP...';
 
             try {
-                if (typeof JSZip === 'undefined') throw new Error("Librería de compresión (JSZip) no cargada.");
-
                 const zip = new JSZip();
-                
-                // 1. Snapshot del HTML actual (OuterHTML)
-                console.log("📄 Generando snapshot de la aplicación...");
-                const currentContent = document.documentElement.outerHTML;
-                zip.file("index.html", "<!DOCTYPE html>\n" + currentContent);
-                
-                // 2. Archivo .bat robusto
-                console.log("⚙️ Creando lanzador .bat...");
-                const batContent = `@echo off & start msedge --app="%~dp0index.html"`;
-                zip.file("Iniciar_MathLab.bat", batContent);
-                
-                // 3. Icono
+
+                // 1. Archivo Offline
+                const htmlStr = document.documentElement.outerHTML;
+                const htmlOffline = '<!DOCTYPE html>\\n<html lang="es" class="dark">\\n' + htmlStr.substring(htmlStr.indexOf('<head>'));
+                zip.file("MathLab.html", htmlOffline);
+
+                // 2. Ejecutable .bat Windows App Mode
+                const batScript = `@echo off
+echo ==== MATHLAB PRO ====
+echo Iniciando en Modo App Nativa...
+start msedge.exe --app="%cd%\\MathLab.html" || start chrome.exe --app="%cd%\\MathLab.html"
+exit`;
+                zip.file("MathLab_Start.bat", batScript);
+
+                // 3. Icono App
                 const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="115" fill="#04060E"/><path d="M 280 110 C 350 110, 310 160, 280 200 C 230 270, 200 370, 200 410 C 200 450, 160 450, 150 410 C 130 330, 200 230, 240 160 C 260 120, 240 110, 280 110 Z" fill="#00F5A0"/></svg>`;
                 zip.file("icon.svg", logoSvg);
-                
-                console.log("💿 Compimiendo paquete...");
-                const content = await zip.generateAsync({ type: "blob" });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(content);
-                a.download = 'MathLab_Bundle_Windows.zip';
-                a.click();
-                console.log("✨ ZIP generado y descargado.");
-            } catch(e) {
-                console.error("❌ Error en descarga Windows:", e);
-                if(errDiv) {
-                    errDiv.innerText = "Error técnico: " + e.message;
-                    errDiv.classList.remove('hidden');
-                }
-            } finally {
-                if(btn) { btn.innerHTML = origHTML; btn.style.opacity = "1"; }
-            }
-        }
 
-        function downloadAndroidInstaller() {
-            console.log("📱 Botón pulsado: Android Fallback (.html)");
-            const instructions = `
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instalador MathLab Android</title>
-    <style>
-        body { background: #04060E; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .card { background: #080C18; border: 1px solid #1A2236; padding: 2rem; border-radius: 2rem; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .logo { width: 80px; height: 80px; background: #00F5A0; border-radius: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; }
-        h1 { margin: 0; font-size: 1.5rem; color: #00F5A0; }
-        p { color: #8892B0; font-size: 0.9rem; line-height: 1.6; }
-        .step { background: #1A2236; padding: 1rem; border-radius: 1rem; margin-top: 1.5rem; text-align: left; }
-        .highlight { color: #00F5A0; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <center><div class="logo"><svg viewBox="0 0 24 24" width="40" height="40" stroke="black" stroke-width="2.5" fill="none"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></div></center>
-        <h1>Instalador MathLab</h1>
-        <p>Has descargado el puente de instalación móvil.</p>
-        <div class="step">
-            1. Abre el menú de tu navegador (<span class="highlight">los 3 puntos</span>).<br>
-            2. Selecciona <span class="highlight">"Añadir a pantalla de inicio"</span>.<br>
-            3. MathLab aparecerá en tu escritorio móvil.
-        </div>
-        <p style="margin-top:2rem; font-size:0.7rem; opacity:0.5;">MathLab Suite v3.0 — PWA Distribution</p>
-    </div>
-</body>
-</html>`;
-            const blob = new Blob([instructions], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'MathLab_Installer.apk.html';
-            a.click();
-            console.log("✨ Instrucciones móviles descargadas.");
+                const blob = await zip.generateAsync({ type: "blob" });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'MathLab_Windows_Pro.zip';
+                a.click();
+            } catch (e) {
+                console.error("Error generando ZIP:", e);
+                alert("Hubo un error al generar el archivo. " + e.message);
+            }
+            btn.innerHTML = origHTML;
         }
 
         // ──────────────────────────────────────────────────────────
@@ -1770,38 +1747,18 @@
             updateProbe();
         }
 
-        // Calculator & Init
+        // Calculator
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("🚀 Iniciando listeners de seguridad...");
-            
-            const ci = document.getElementById('calcin');
-            if (ci) {
-                ci.addEventListener('input', e => {
-                    const val = (e.target.value || "").trim(), el = document.getElementById('calcout');
-                    if (!el) return;
-                    if (!val) { el.textContent = '—'; el.className = 'rval text-lg break-all text-base-400'; return; }
-                    try {
-                        const r = math.evaluate(val);
-                        el.textContent = typeof r === 'function' ? '[Función]' : math.format(r, { precision: 14 });
-                        el.className = 'rval text-lg break-all text-neon font-mono';
-                    } catch { el.textContent = '...'; el.className = 'rval text-lg break-all text-base-500'; }
-                });
-            }
-
-            const fi2d = document.getElementById('fi2d');
-            if (fi2d) {
-                fi2d.addEventListener('keydown', e => { if (e.key === 'Enter') analyze2D(); });
-            }
-
-            // Distribution bindings (onclick override for safety)
-            const wb = document.getElementById('win-btn'); if(wb) wb.onclick = downloadWindowsBundle;
-            const pi = document.getElementById('pwa-install-btn'); if(pi) pi.onclick = triggerInstall;
-            const ab = document.getElementById('android-alt-btn'); if(ab) ab.onclick = downloadAndroidInstaller;
-
-            setTimeout(() => { if (typeof analyze2D === 'function') analyze2D(); }, 900);
+            document.getElementById('calcin').addEventListener('input', e => {
+                const val = e.target.value.trim(), el = document.getElementById('calcout');
+                if (!val) { el.textContent = '—'; el.className = 'rval text-lg break-all text-base-400'; return; }
+                try {
+                    const r = math.evaluate(val);
+                    el.textContent = typeof r === 'function' ? '[Función]' : math.format(r, { precision: 14 });
+                    el.className = 'rval text-lg break-all text-neon font-mono';
+                } catch { el.textContent = 'Expresión no válida…'; el.className = 'rval text-lg break-all text-base-500'; }
+            });
         });
-        
-        // ELIMINADO EL SERVICE WORKER PARA GITHUB PAGES COMPATIBILITY
 
         // ──────────────────────────────────────────────────────────
         // MODE / TAB
@@ -2010,17 +1967,17 @@
         // ──────────────────────────────────────────────────────────
         function domainDisc(rawStr) {
             const discs = [];
-            
+
             function checkRoot(expStr) {
                 try {
                     const fn = math.compile(expStr);
-                    const f = x => fn.evaluate({x});
+                    const f = x => fn.evaluate({ x });
                     const found = roots(f, -100, 100, 1500);
                     found.forEach(r => {
                         const cr = R(r, 2);
                         if (!discs.some(d => Math.abs(d - cr) < 0.05)) discs.push(+cr);
                     });
-                } catch(e) {}
+                } catch (e) { }
             }
 
             const pieces = rawStr.split(';');
@@ -2036,7 +1993,7 @@
                             if (['log', 'log10', 'ln', 'sqrt'].includes(fnName)) checkRoot(n.args[0].toString());
                         }
                     });
-                } catch(e) {}
+                } catch (e) { }
             });
 
             if (rawStr.includes('si ')) {
@@ -2104,7 +2061,7 @@
                     } else if (mPos !== null && bPos !== null) r.obl = { m: R(mPos, 3), b: R(bPos, 3), side: '(x→+∞)' };
                     else if (mNeg !== null && bNeg !== null) r.obl = { m: R(mNeg, 3), b: R(bNeg, 3), side: '(x→−∞)' };
                 }
-            } catch(e) {}
+            } catch (e) { }
             return r;
         }
 
@@ -2627,9 +2584,66 @@
 
         window.addEventListener('load', () => setTimeout(analyze2D, 900));
 
-        // ──────────────────────────────────────────────────────────
-        // END OF SCRIPT - ZERO ERROR DEPLOYMENT
-        // ──────────────────────────────────────────────────────────
+        // PWA Service Worker Estratégico (100% Offline & Stale-While-Revalidate)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'mathlab-offline-v3.0';
+                
+                // Archivos críticos a retener en la instalación inicial (CDNs)
+                const PRECACHE = [
+                    './',
+                    'https://cdn.tailwindcss.com',
+                    'https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js',
+                    'https://cdn.plot.ly/plotly-2.27.0.min.js',
+                    'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js'
+                ];
+
+                self.addEventListener('install', e => {
+                    self.skipWaiting();
+                    e.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => {
+                            return Promise.allSettled(
+                                PRECACHE.map(url => cache.add(new Request(url, { mode: 'no-cors' })))
+                            );
+                        })
+                    );
+                });
+
+                self.addEventListener('activate', e => {
+                    e.waitUntil(
+                        caches.keys().then(keys => Promise.all(
+                            keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+                        )).then(() => self.clients.claim())
+                    );
+                });
+
+                self.addEventListener('fetch', e => {
+                    const req = e.request;
+                    e.respondWith(
+                        caches.match(req).then(cachedRes => {
+                            const netFetch = fetch(req).then(netRes => {
+                                if (netRes && netRes.status === 200 && netRes.type !== 'error') {
+                                    const resClone = netRes.clone();
+                                    caches.open(CACHE_NAME).then(c => c.put(req, resClone));
+                                }
+                                return netRes;
+                            }).catch(() => null);
+                            
+                            // Stale-while-revalidate: devuelve caché de inmediato, actualiza en fondo.
+                            // Si no hay caché, espera al network.
+                            return cachedRes || netFetch;
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).then(() => {
+                console.log('✅ Service Worker listo. MathLab Pro es 100% Offline.');
+            });
+        }
     </script>
 </body>
 
