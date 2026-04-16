@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060810">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MathLab">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E">
+    <script>
+        (function() {
+            const manifest = { "name": "MathLab Pro", "short_name": "MathLab", "display": "standalone", "orientation": "any", "background_color": "#04060E", "theme_color": "#080C18", "icons": [{"src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable"}] };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
+            document.head.appendChild(link);
+        })();
+    </script>
+    <meta name="description" content="Suite avanzada de análisis matemático 2D/3D multivariable">
+    <title>MathLab Suite — Cálculo Multivariable Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } };</script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class', theme: {
+                extend: {
+                    fontFamily: { mono: ['Space Mono', 'monospace'], sans: ['Inter', 'sans-serif'] }, colors: {
+                        base: { 950: '#04060E', 900: '#080C18', 800: '#0F1626', 700: '#1A2236', 600: '#273048', 500: '#4A5568', 400: '#718096' },
+                        neon: { DEFAULT: '#00F5A0', dim: '#00C67F', dark: '#007A50' },
+                        plasma: { DEFAULT: '#FF6B6B', dim: '#CC5555' },
+                        sky: { DEFAULT: '#60A5FA', dim: '#3B82F6' },
+                        gold: { DEFAULT: '#FCD34D', dim: '#F59E0B' },
+                        violet: { DEFAULT: '#C4B5FD', dim: '#8B5CF6' },
+                        coral: { DEFAULT: '#FB923C' }
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            background: #04060E;
+            font-family: 'Inter', sans-serif;
+            color: #E2E8F0;
+            overflow-x: hidden
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #080C18
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1A2236;
+            border-radius: 2px
+        }
+
+        .grid-bg {
+            background-image: linear-gradient(rgba(0, 245, 160, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 245, 160, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px
+        }
+
+        .glass {
+            background: linear-gradient(135deg, rgba(15, 22, 38, .9), rgba(8, 12, 24, .95));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 245, 160, .08);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .04)
+        }
+
+        .rcard {
+            background: linear-gradient(145deg, rgba(15, 22, 38, .95), rgba(4, 6, 14, .98));
+            border: 1px solid rgba(26, 34, 54, .8);
+            border-radius: 10px;
+            padding: .875rem;
+            margin-bottom: .625rem;
+            transition: all .3s cubic-bezier(.4, 0, .2, 1)
+        }
+
+        .rcard:hover {
+            border-color: rgba(0, 245, 160, .2);
+            box-shadow: 0 4px 20px rgba(0, 245, 160, .05);
+            transform: translateY(-1px)
+        }
+
+        .rlabel {
+            font-family: 'Space Mono', monospace;
+            font-size: .6rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: #4A5568;
+            margin-bottom: .4rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem
+        }
+
+        .rval {
+            font-size: .875rem;
+            color: #CBD5E0;
+            line-height: 1.6
+        }
+
+        .rdot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .d-neon {
+            background: #00F5A0;
+            box-shadow: 0 0 6px #00F5A0
+        }
+
+        .d-plasma {
+            background: #FF6B6B;
+            box-shadow: 0 0 6px #FF6B6B
+        }
+
+        .d-sky {
+            background: #60A5FA;
+            box-shadow: 0 0 6px #60A5FA
+        }
+
+        .d-gold {
+            background: #FCD34D;
+            box-shadow: 0 0 6px #FCD34D
+        }
+
+        .d-violet {
+            background: #C4B5FD;
+            box-shadow: 0 0 6px #C4B5FD
+        }
+
+        .d-coral {
+            background: #FB923C;
+            box-shadow: 0 0 6px #FB923C
+        }
+
+        .mi {
+            background: rgba(4, 6, 14, .8);
+            border: 1px solid #1A2236;
+            color: #E2E8F0;
+            font-family: 'Space Mono', monospace;
+            font-size: 16px; /* 16px mandatory to prevent auto-zoom in iOS/Android inputs */
+            transition: all .2s;
+            outline: none;
+            border-radius: 8px
+        }
+
+        .mi:focus {
+            border-color: #00F5A0;
+            box-shadow: 0 0 0 3px rgba(0, 245, 160, .1)
+        }
+
+        .mi::placeholder {
+            color: #4A5568
+        }
+
+        .btnp {
+            background: linear-gradient(135deg, #00F5A0, #00C67F);
+            color: #04060E;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: .75rem;
+            letter-spacing: .08em;
+            transition: all .2s;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px
+        }
+
+        .btnp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 245, 160, .35)
+        }
+
+        .btng {
+            background: rgba(26, 34, 54, .6);
+            border: 1px solid #1A2236;
+            color: #718096;
+            font-family: 'Space Mono', monospace;
+            font-size: .65rem;
+            transition: all .15s;
+            cursor: pointer;
+            border-radius: 6px
+        }
+
+        .btng:hover {
+            border-color: #00F5A0;
+            color: #00F5A0;
+            background: rgba(0, 245, 160, .05)
+        }
+
+        .mkey {
+            background: rgba(15, 22, 38, .9);
+            border: 1px solid rgba(26, 34, 54, .9);
+            color: #A0AEC0;
+            font-size: .85rem;
+            padding: .35rem .5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'Space Mono', monospace;
+            white-space: nowrap;
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mkey:hover {
+            border-color: #00F5A0;
+            color: #00F5A0;
+            background: rgba(0, 245, 160, .08);
+            transform: scale(1.05)
+        }
+
+        .mkey:active {
+            transform: scale(.97)
+        }
+
+        .mcat {
+            font-size: .55rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #4A5568;
+            padding: .15rem .4rem;
+            margin-bottom: .25rem
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: .65rem;
+            padding: .1rem .45rem;
+            border-radius: 4px;
+            margin: .1rem
+        }
+
+        .tn {
+            background: rgba(0, 245, 160, .1);
+            color: #00F5A0;
+            border: 1px solid rgba(0, 245, 160, .2)
+        }
+
+        .tp {
+            background: rgba(255, 107, 107, .1);
+            color: #FF6B6B;
+            border: 1px solid rgba(255, 107, 107, .2)
+        }
+
+        .ts {
+            background: rgba(96, 165, 250, .1);
+            color: #60A5FA;
+            border: 1px solid rgba(96, 165, 250, .2)
+        }
+
+        .tg {
+            background: rgba(252, 211, 77, .1);
+            color: #FCD34D;
+            border: 1px solid rgba(252, 211, 77, .2)
+        }
+
+        .tv {
+            background: rgba(196, 181, 253, .1);
+            color: #C4B5FD;
+            border: 1px solid rgba(196, 181, 253, .2)
+        }
+
+        .stitle {
+            font-family: 'Space Mono', monospace;
+            font-size: .6rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: #4A5568;
+            padding: .5rem 0;
+            border-bottom: 1px solid rgba(26, 34, 54, .8);
+            margin-bottom: .75rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem
+        }
+
+        .stitle::before {
+            content: '';
+            width: 3px;
+            height: 12px;
+            background: linear-gradient(to bottom, #00F5A0, #007A50);
+            border-radius: 2px
+        }
+
+        .tabbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem;
+            background: rgba(4, 6, 14, .6);
+            border: 1px solid #1A2236;
+            border-radius: 10px;
+            padding: .25rem
+        }
+
+        .tbtn {
+            font-family: 'Space Mono', monospace;
+            font-size: .6rem;
+            letter-spacing: .08em;
+            padding: .35rem .65rem;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all .15s;
+            color: #4A5568;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap
+        }
+
+        .tbtn.active {
+            background: rgba(0, 245, 160, .1);
+            border-color: rgba(0, 245, 160, .3);
+            color: #00F5A0
+        }
+
+        .tbtn:not(.active):hover {
+            color: #A0AEC0;
+            background: rgba(26, 34, 54, .5)
+        }
+
+        .panel {
+            display: none
+        }
+
+        .panel.active {
+            display: block
+        }
+
+        .spin {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #1A2236;
+            border-top-color: #00F5A0;
+            border-radius: 50%;
+            animation: spin .6s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .pulsedot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00F5A0;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(0, 245, 160, .5)
+            }
+
+            50% {
+                opacity: .8;
+                box-shadow: 0 0 0 6px rgba(0, 245, 160, 0)
+            }
+        }
+
+        .modetog {
+            position: relative;
+            width: 190px;
+            height: 36px;
+            background: rgba(4, 6, 14, .8);
+            border: 1px solid #1A2236;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 3px;
+            flex-shrink: 0
+        }
+
+        .togslide {
+            position: absolute;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            background: linear-gradient(135deg, rgba(0, 245, 160, .15), rgba(0, 198, 127, .1));
+            border: 1px solid rgba(0, 245, 160, .3);
+            border-radius: 7px;
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            left: 3px
+        }
+
+        .togslide.right {
+            transform: translateX(100%)
+        }
+
+        .toglabel {
+            flex: 1;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: .65rem;
+            letter-spacing: .1em;
+            z-index: 1;
+            transition: color .2s
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #1A2236;
+            border-radius: 2px;
+            outline: none
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00F5A0;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 245, 160, .5);
+            cursor: pointer
+        }
+
+        .errm {
+            color: #FF6B6B;
+            font-family: 'Space Mono', monospace;
+            font-size: .75rem
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .fin {
+            animation: fadeIn .3s ease forwards
+        }
+
+        .plotc {
+            border-radius: 10px;
+            overflow: hidden
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 6, 14, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(15, 22, 38, 0.95), rgba(4, 6, 14, 0.98));
+            border: 1px solid rgba(0, 245, 160, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 245, 160, 0.15);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .ibtn {
+            font-family: monospace;
+            background: rgba(0, 245, 160, 0.1);
+            color: #00F5A0;
+            border: 1px solid rgba(0, 245, 160, 0.3);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: auto;
+            transition: all 0.2s;
+            padding-bottom: 1px;
+        }
+
+        .ibtn:hover {
+            background: #00F5A0;
+            color: #04060E;
+            box-shadow: 0 0 10px rgba(0, 245, 160, 0.5);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen grid-bg">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 glass border-b border-base-700/50">
+        <div class="max-w-screen-2xl mx-auto px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-3">
+                <div class="pulsedot"></div>
+                <span class="font-mono font-bold text-neon tracking-wider text-sm">MATHLAB</span>
+                <span class="text-base-500 text-xs font-mono">/ suite v3.0</span>
+            </div>
+            <div class="modetog" id="modeToggle" onclick="toggleMode()">
+                <div class="togslide" id="togSlide"></div>
+                <span class="toglabel text-neon" id="lbl2d">⬛ 2D</span>
+                <span class="toglabel text-base-500" id="lbl3d">🧊 3D</span>
+            </div>
+            <div class="hidden md:flex items-center gap-4">
+                <div class="text-xs text-base-500 font-mono">math.js · plotly · mathjax</div>
+                <button onclick="document.getElementById('appCenterModal').style.display='flex'"
+                    class="btnp px-3 py-1.5 text-[0.65rem] flex items-center gap-1.5 rounded-md">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    APP CENTER
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-screen-2xl mx-auto px-3 py-4">
+
+        <!-- ===================== 2D MODE ===================== -->
+        <div id="mode2d">
+            <!-- Input bar 2D -->
+            <div class="glass rounded-xl p-4 mb-4">
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col md:flex-row gap-3 items-start md:items-end">
+                        <div class="flex-1">
+                            <label
+                                class="block font-mono text-xs text-base-400 mb-1.5 tracking-widest uppercase">f(x)</label>
+                            <input id="fi2d" type="text"
+                                placeholder="x^3 - 3*x + 1  |  sin(x)/x  |  x^2 si x&lt;0; x si x&gt;=0"
+                                class="mi w-full px-4 py-2.5" value="x^3 - 3*x + 1" onfocus="activeInput='fi2d'" />
+                        </div>
+                        <div class="flex items-end gap-2 flex-wrap">
+                            <div><label class="block font-mono text-xs text-base-400 mb-1.5 flex items-center gap-2">
+                                    Rango:
+                                    <select id="rangemode2d"
+                                        class="mi px-2 py-0.5 text-xs cursor-pointer d-neon bg-base-800"
+                                        onchange="toggleRange2D()">
+                                        <option value="manual">Manual</option>
+                                        <option value="auto" selected>Auto</option>
+                                        <option value="inf">Infinito (∞)</option>
+                                    </select>
+                                </label><input id="xmin2d" type="number" value="-5"
+                                    class="mi px-3 py-2.5 w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled />
+                            </div>
+                            <div><label class="block font-mono text-xs text-base-400 mb-1.5">&nbsp;</label><input
+                                    id="xmax2d" type="number" value="5"
+                                    class="mi px-3 py-2.5 w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled /></div>
+                            <button id="abtn2d" class="btnp px-6 py-2.5 text-xs" onclick="analyze2D()">⟨ ANALIZAR
+                                ⟩</button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-base-500 font-mono"><span class="text-neon">Trozos:</span> usa <code
+                            class="bg-base-800 px-1 rounded">f1 si x&lt;a; f2 si x&gt;=a</code> — usa los botones para
+                        insertar funciones</p>
+                    <!-- MATH KEYBOARD 2D -->
+                    <div class="border-t border-base-700/50 pt-3">
+                        <div class="flex flex-wrap gap-1.5 items-center">
+                            <span class="mcat">Trig:</span>
+                            <button class="mkey" onclick="ins('fi2d','sin(')">sin</button>
+                            <button class="mkey" onclick="ins('fi2d','cos(')">cos</button>
+                            <button class="mkey" onclick="ins('fi2d','tan(')">tan</button>
+                            <button class="mkey" onclick="ins('fi2d','asin(')">arcsin</button>
+                            <button class="mkey" onclick="ins('fi2d','acos(')">arccos</button>
+                            <button class="mkey" onclick="ins('fi2d','atan(')">arctan</button>
+                            <span class="mcat ml-2">Raíces/Pot:</span>
+                            <button class="mkey" onclick="ins('fi2d','sqrt(')">√x</button>
+                            <button class="mkey" onclick="ins('fi2d','cbrt(')">∛x</button>
+                            <button class="mkey" onclick="ins('fi2d','^2')">x²</button>
+                            <button class="mkey" onclick="ins('fi2d','^')">xⁿ</button>
+                            <button class="mkey" onclick="ins('fi2d','exp(')">eˣ</button>
+                            <span class="mcat ml-2">Log:</span>
+                            <button class="mkey" onclick="ins('fi2d','log(')">log₁₀</button>
+                            <button class="mkey" onclick="ins('fi2d','log2(')">log₂</button>
+                            <button class="mkey" onclick="ins('fi2d','ln(')">ln</button>
+                            <span class="mcat ml-2">Esp:</span>
+                            <button class="mkey" onclick="ins('fi2d','abs(')">|x|</button>
+                            <button class="mkey" onclick="ins('fi2d','pi')">π</button>
+                            <button class="mkey" onclick="ins('fi2d','e')">e</button>
+                            <button class="mkey" onclick="ins('fi2d','floor(')">⌊x⌋</button>
+                            <button class="mkey" onclick="ins('fi2d','ceil(')">⌈x⌉</button>
+                            <button class="mkey" onclick="ins('fi2d','sinh(')">sinh</button>
+                            <button class="mkey" onclick="ins('fi2d','cosh(')">cosh</button>
+                            <button class="mkey" onclick="insPiece()">a trozos ⧉</button>
+                        </div>
+                    </div>
+                    <div id="err2d" class="errm hidden"></div>
+                </div>
+            </div>
+
+            <!-- 2D Main Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                <!-- Left -->
+                <div class="xl:col-span-2 flex flex-col gap-4">
+                    <!-- Plot 2D -->
+                    <div class="glass rounded-xl overflow-hidden">
+                        <div class="px-4 py-2.5 border-b border-base-700/40 flex items-center justify-between">
+                            <span class="font-mono text-xs text-base-400 tracking-widest uppercase">Gráfica 2D
+                                Interactiva</span>
+                            <div id="fdisplay2d" class="text-sm text-neon font-mono">f(x) = ...</div>
+                        </div>
+                        <div id="plt2d" class="plotc" style="height:400px"></div>
+                    </div>
+                    <!-- Tangent slider -->
+                    <div class="glass rounded-xl p-4">
+                        <div class="stitle">Recta Tangente Interactiva</div>
+                        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                            <div class="flex-1">
+                                <label class="block font-mono text-xs text-base-400 mb-2 tracking-widest">Punto x =
+                                    <span id="tanxval" class="text-neon">1</span></label>
+                                <input id="tanslider" type="range" min="-5" max="5" step="0.05" value="1"
+                                    oninput="tangentSlide(+this.value)" />
+                            </div>
+                            <div class="flex gap-2 flex-1">
+                                <div class="rcard flex-1 mb-0">
+                                    <div class="rlabel"><span class="rdot d-sky"></span>Pendiente f'(a)</div>
+                                    <div id="tanslope" class="rval font-mono text-sm">—</div>
+                                </div>
+                                <div class="rcard flex-1 mb-0">
+                                    <div class="rlabel"><span class="rdot d-neon"></span>f(a)</div>
+                                    <div id="tanfa" class="rval font-mono text-sm">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rcard mt-3">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Ecuación de la tangente</div>
+                            <div id="taneq2d" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Tabs 2D -->
+                <div class="flex flex-col gap-3">
+                    <div class="tabbar" id="tab2d">
+                        <button class="tbtn active" data-t="deriv" onclick="tab2d(this)">Derivadas</button>
+                        <button class="tbtn" data-t="dom" onclick="tab2d(this)">Dominio</button>
+                        <button class="tbtn" data-t="asint" onclick="tab2d(this)">Asíntotas</button>
+                        <button class="tbtn" data-t="mono" onclick="tab2d(this)">Monotonía</button>
+                        <button class="tbtn" data-t="integ" onclick="tab2d(this)">∫ Integ.</button>
+                        <button class="tbtn" data-t="taylor" onclick="tab2d(this)">Taylor</button>
+                        <button class="tbtn" data-t="calc" onclick="tab2d(this)">Calc.</button>
+                        <button class="tbtn" data-t="prop" onclick="tab2d(this)">Propiedades</button>
+                    </div>
+
+                    <div id="p2-deriv" class="panel active glass rounded-xl p-4 fin">
+                        <div class="stitle w-full flex items-center">Cálculo Diferencial <button class="ibtn"
+                                onclick="showTheory('Derivada Teórica', 'La derivada $f\'(x)$ mide la tasa de cambio instantánea de la función matemática en cualquier punto. Matemáticamente es el límite del cociente de diferencias:\\n$$f\'(x)=\\lim_{h\\to0}\\frac{f(x+h)-f(x)}{h}$$')">i</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Primera Derivada f'(x)</div>
+                            <div id="d1" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Segunda Derivada f''(x)</div>
+                            <div id="d2" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Tercera Derivada f'''(x)</div>
+                            <div id="d3" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Definición límite</div>
+                            <div class="rval text-xs">$$f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}$$</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-dom" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Dominio y Puntos Notables</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Dominio Natural</div>
+                            <div id="dom" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Discontinuidades</div>
+                            <div id="disc" class="rval">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Puntos Críticos f'=0</div>
+                            <div id="crit" class="rval">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Puntos de Inflexión f''=0</div>
+                            <div id="infl" class="rval">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-asint" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Asíntotas</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Verticales</div>
+                            <div id="asv" class="rval">—</div>
+                            <div class="rval text-xs mt-1">$$\lim_{x\to a}f(x)=\pm\infty$$</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Horizontales</div>
+                            <div id="ash" class="rval">—</div>
+                            <div class="rval text-xs mt-1">$$\lim_{x\to\pm\infty}f(x)=L$$</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Oblicua</div>
+                            <div id="aso" class="rval">—</div>
+                            <div class="rval text-xs mt-1">$$m=\lim_{x\to\infty}\frac{f(x)}{x}$$</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-mono" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Monotonía y Curvatura</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Creciente <span
+                                    class="tag tn">f'&gt;0</span></div>
+                            <div id="inc" class="rval">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Decreciente <span
+                                    class="tag tp">f'&lt;0</span></div>
+                            <div id="dec" class="rval">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Cóncava ∪ <span
+                                    class="tag ts">f''&gt;0</span></div>
+                            <div id="cu" class="rval">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Cóncava ∩ <span
+                                    class="tag tv">f''&lt;0</span></div>
+                            <div id="cd" class="rval">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-integ" class="panel glass rounded-xl p-4">
+                        <div class="stitle w-full flex items-center">Integración Numérica y Simbólica <button
+                                class="ibtn"
+                                onclick="showTheory('Regla de Simpson', 'La regla de Simpson aproxima la integral definida iterando numéricamente parábolas encadenadas, por lo cual es más exacta que áreas rectangulares.\\n$$\\int f(x)dx \\approx \\frac{h}{3}[f(x_0)+4f(x_1)+2f(x_2)...]$$')">i</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>∫ f(x)dx — Regla de Simpson</div>
+                            <div id="intval" class="rval text-neon text-lg font-mono font-bold mt-1">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Rango Numérico</div>
+                            <div id="intrange" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>∫ f(x)dx — Integral Simbólica
+                                Indefinida <button class="ibtn"
+                                    onclick="showTheory('Integral Indefinida', 'También llamada antiderivada, corresponde a una formulación exacta de la familia de funciones F(x) donde $F\'(x) = f(x)$. Obtenido mediante un sistema CAS (Nerdamer).')">i</button>
+                            </div>
+                            <div id="intsym" class="rval text-sm font-mono">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-taylor" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Serie de Taylor</div>
+                        <div class="flex gap-2 mb-3">
+                            <div class="flex-1"><label class="block font-mono text-xs text-base-400 mb-1">Punto
+                                    a</label><input id="taylora" type="number" value="0"
+                                    class="mi px-3 py-2 w-full text-sm text-center" /></div>
+                            <div class="flex-1"><label class="block font-mono text-xs text-base-400 mb-1">Orden
+                                    n</label>
+                                <select id="taylorN" class="mi px-3 py-2 w-full text-sm text-center">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <button class="btnp px-4 py-2 self-end text-xs" onclick="calcTaylor()">→</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Polinomio</div>
+                            <div id="tayres" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Fórmula</div>
+                            <div class="rval text-xs">$$P_n(x)=\sum_{k=0}^n\frac{f^{(k)}(a)}{k!}(x-a)^k$$</div>
+                        </div>
+                    </div>
+
+                    <div id="p2-calc" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Calculadora Científica</div>
+                        <!-- Display -->
+                        <div class="rcard mb-2 relative">
+                            <div id="calcout" class="rval font-mono text-xl break-all text-right min-h-8"
+                                style="color:#00F5A0">—</div>
+                            <div id="calcin-disp" class="text-xs text-base-500 font-mono text-right truncate">&nbsp;
+                            </div>
+                        </div>
+                        <!-- Keyboard -->
+                        <div class="grid gap-1" style="grid-template-columns:repeat(5,1fr)">
+                            <!-- Row 1 -->
+                            <button class="mkey col-span-2" onclick="calcKb('clear')">AC</button>
+                            <button class="mkey" onclick="calcKb('(')">( )</button>
+                            <button class="mkey" onclick="calcKb('%')">%</button>
+                            <button class="mkey" style="color:#FB923C;border-color:#FB923C55"
+                                onclick="calcKb('/')">÷</button>
+                            <!-- Row 2 -->
+                            <button class="mkey" onclick="calcKb('7')">7</button>
+                            <button class="mkey" onclick="calcKb('8')">8</button>
+                            <button class="mkey" onclick="calcKb('9')">9</button>
+                            <button class="mkey" onclick="calcKb('del')">⌫</button>
+                            <button class="mkey" style="color:#FB923C;border-color:#FB923C55"
+                                onclick="calcKb('*')">×</button>
+                            <!-- Row 3 -->
+                            <button class="mkey" onclick="calcKb('4')">4</button>
+                            <button class="mkey" onclick="calcKb('5')">5</button>
+                            <button class="mkey" onclick="calcKb('6')">6</button>
+                            <button class="mkey" onclick="calcKb('^')">xⁿ</button>
+                            <button class="mkey" style="color:#FB923C;border-color:#FB923C55"
+                                onclick="calcKb('-')">−</button>
+                            <!-- Row 4 -->
+                            <button class="mkey" onclick="calcKb('1')">1</button>
+                            <button class="mkey" onclick="calcKb('2')">2</button>
+                            <button class="mkey" onclick="calcKb('3')">3</button>
+                            <button class="mkey" onclick="calcKb('sqrt(')">√</button>
+                            <button class="mkey" style="color:#FB923C;border-color:#FB923C55"
+                                onclick="calcKb('+')">+</button>
+                            <!-- Row 5 -->
+                            <button class="mkey col-span-2" onclick="calcKb('0')">0</button>
+                            <button class="mkey" onclick="calcKb('.')">.</button>
+                            <button class="mkey" style="color:#60A5FA;border-color:#60A5FA55"
+                                onclick="calcKb('pi')">π</button>
+                            <button class="mkey"
+                                style="background:rgba(0,245,160,.15);color:#00F5A0;border-color:#00F5A055"
+                                onclick="calcKb('=')"> = </button>
+                        </div>
+                        <!-- Scientific row -->
+                        <div class="grid gap-1 mt-1" style="grid-template-columns:repeat(5,1fr)">
+                            <button class="mkey" onclick="calcKb('sin(')">sin</button>
+                            <button class="mkey" onclick="calcKb('cos(')">cos</button>
+                            <button class="mkey" onclick="calcKb('tan(')">tan</button>
+                            <button class="mkey" onclick="calcKb('log(')">ln</button>
+                            <button class="mkey" onclick="calcKb('log10(')">log₁₀</button>
+                            <button class="mkey" onclick="calcKb('asin(')">asin</button>
+                            <button class="mkey" onclick="calcKb('acos(')">acos</button>
+                            <button class="mkey" onclick="calcKb('atan(')">atan</button>
+                            <button class="mkey" onclick="calcKb('e')">e</button>
+                            <button class="mkey" onclick="calcKb('factorial(')">n!</button>
+                            <button class="mkey" onclick="calcKb('abs(')">|x|</button>
+                            <button class="mkey" onclick="calcKb('combinations(')">C(n,k)</button>
+                            <button class="mkey" onclick="calcKb('permutations(')">P(n,k)</button>
+                            <button class="mkey" onclick="calcKb('gcd(')">mcd</button>
+                            <button class="mkey" onclick="calcKb('lcm(')">mcm</button>
+                        </div>
+                        <!-- Matrix row -->
+                        <div class="mt-2">
+                            <div class="text-xs text-base-400 mb-1 font-mono">Matrices (formato: [[a,b],[c,d]])</div>
+                            <div class="grid gap-1" style="grid-template-columns:repeat(4,1fr)">
+                                <button class="mkey" onclick="calcEx('det([[1,2],[3,4]])')">det(M)</button>
+                                <button class="mkey" onclick="calcEx('inv([[2,1],[5,3]])')">inv(M)</button>
+                                <button class="mkey" onclick="calcEx('transpose([[1,2],[3,4]])')">Mᵀ</button>
+                                <button class="mkey" onclick="calcEx('eigs([[2,1],[1,2]])')">autoval</button>
+                                <button class="mkey" onclick="calcEx('norm([3,4])')">||v||</button>
+                                <button class="mkey" onclick="calcEx('dot([1,2],[3,4])')">v·w</button>
+                                <button class="mkey" onclick="calcEx('cross([1,0,0],[0,1,0])')">v×w</button>
+                                <button class="mkey" onclick="calcEx('5 cm to inch')">unit conv</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="p2-prop" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Propiedades y Cortes</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Cortes con los Ejes</div>
+                            <div id="cortes2d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Paridad (Simetría)</div>
+                            <div id="paridad2d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="stitle mt-4">Derivabilidad en un punto</div>
+                        <div class="flex gap-2 mb-3">
+                            <div class="flex-1"><label class="block font-mono text-xs text-base-400 mb-1">Punto evaluar
+                                    $x_0$</label>
+                                <input id="derivx0" type="number" value="0"
+                                    class="mi px-3 py-2 w-full text-sm text-center" />
+                            </div>
+                            <button class="btnp px-4 py-2 self-end text-xs" onclick="checkDeriv2D()">Evaluar</button>
+                        </div>
+                        <div class="rcard">
+                            <div id="derivres2d" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Values Table 2D -->
+            <div class="glass rounded-xl p-4 mt-4">
+                <div class="stitle">Tabla de Valores</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm font-mono">
+                        <thead>
+                            <tr class="border-b border-base-700/40">
+                                <th class="text-left py-2 px-3 text-base-400 text-xs font-normal">x</th>
+                                <th class="text-right py-2 px-3 text-base-400 text-xs font-normal">f(x)</th>
+                                <th class="text-right py-2 px-3 text-base-400 text-xs font-normal">f'(x)</th>
+                                <th class="text-right py-2 px-3 text-base-400 text-xs font-normal">f''(x)</th>
+                                <th class="text-right py-2 px-3 text-base-400 text-xs font-normal">Mono.</th>
+                                <th class="text-right py-2 px-3 text-base-400 text-xs font-normal">Curv.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vtbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- END 2D -->
+
+        <!-- ===================== 3D MODE ===================== -->
+        <div id="mode3d" class="hidden">
+            <!-- Input 3D -->
+            <div class="glass rounded-xl p-4 mb-4">
+                <div class="flex gap-2 mb-4">
+                    <button id="bscalar" class="btnp px-4 py-1.5 text-xs" onclick="set3DMode('scalar')">⬛ f(x,y)
+                        Superficie</button>
+                    <button id="bvector" class="btng px-4 py-1.5 text-xs" onclick="set3DMode('vector')">→ Campo
+                        Vectorial F(P,Q)</button>
+                </div>
+                <div id="inp3ds">
+                    <div class="flex flex-col md:flex-row gap-3 items-start md:items-end">
+                        <div class="flex-1">
+                            <label class="block font-mono text-xs text-base-400 mb-1.5 uppercase tracking-widest">f(x,
+                                y)</label>
+                            <input id="fi3d" type="text" placeholder="x^2 + y^2  |  sin(x)*cos(y)  |  x^2 - y^2"
+                                class="mi w-full px-4 py-2.5" value="x^2 + y^2" onfocus="activeInput='fi3d'" />
+                        </div>
+                        <div class="flex items-end gap-2 flex-wrap">
+                            <div><label class="block font-mono text-xs text-base-400 mb-1 flex items-center gap-2">
+                                    Rango:
+                                    <select id="rangemode3d"
+                                        class="mi px-2 py-0.5 text-xs cursor-pointer d-neon bg-base-800"
+                                        onchange="toggleRange3D()">
+                                        <option value="manual">Manual</option>
+                                        <option value="auto" selected>Auto</option>
+                                        <option value="inf">Infinito (∞)</option>
+                                    </select>
+                                </label>
+                                <div class="flex gap-1"><input id="xmin3d" type="number" value="-3"
+                                        class="mi px-2 py-2.5 w-16 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled /><input id="xmax3d" type="number" value="3"
+                                        class="mi px-2 py-2.5 w-16 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled /></div>
+                            </div>
+                            <div><label class="block font-mono text-xs text-base-400 mb-1">&nbsp;</label>
+                                <div class="flex gap-1"><input id="ymin3d" type="number" value="-3"
+                                        class="mi px-2 py-2.5 w-16 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled /><input id="ymax3d" type="number" value="3"
+                                        class="mi px-2 py-2.5 w-16 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled /></div>
+                            </div>
+                            <button id="abtn3d" class="btnp px-5 py-2.5 text-xs" onclick="analyze3D()">⟨ CALCULAR
+                                ⟩</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="inp3dv" class="hidden">
+                    <div class="flex flex-col md:flex-row gap-3 items-start md:items-end">
+                        <div class="flex-1"><label class="block font-mono text-xs text-base-400 mb-1.5 uppercase">P(x,y)
+                                — comp. î</label><input id="vecP" type="text" placeholder="-y"
+                                class="mi w-full px-4 py-2.5" value="-y" onfocus="activeInput='vecP'" /></div>
+                        <div class="flex-1"><label class="block font-mono text-xs text-base-400 mb-1.5 uppercase">Q(x,y)
+                                — comp. ĵ</label><input id="vecQ" type="text" placeholder="x"
+                                class="mi w-full px-4 py-2.5" value="x" onfocus="activeInput='vecQ'" /></div>
+                        <button class="btnp px-5 py-2.5 text-xs" onclick="analyzeVF()">⟨ CALCULAR ⟩</button>
+                    </div>
+                </div>
+                <!-- MATH KEYBOARD 3D (shared) -->
+                <div class="border-t border-base-700/50 mt-3 pt-3">
+                    <div class="flex flex-wrap gap-1.5 items-center">
+                        <span class="mcat">Trig:</span>
+                        <button class="mkey" onclick="ins(activeInput,'sin(')">sin</button>
+                        <button class="mkey" onclick="ins(activeInput,'cos(')">cos</button>
+                        <button class="mkey" onclick="ins(activeInput,'tan(')">tan</button>
+                        <span class="mcat ml-2">Raíces:</span>
+                        <button class="mkey" onclick="ins(activeInput,'sqrt(')">√</button>
+                        <button class="mkey" onclick="ins(activeInput,'^2')">²</button>
+                        <button class="mkey" onclick="ins(activeInput,'^')">xⁿ</button>
+                        <button class="mkey" onclick="ins(activeInput,'exp(')">eˣ</button>
+                        <span class="mcat ml-2">Log:</span>
+                        <button class="mkey" onclick="ins(activeInput,'log(')">log</button>
+                        <button class="mkey" onclick="ins(activeInput,'ln(')">ln</button>
+                        <span class="mcat ml-2">Esp:</span>
+                        <button class="mkey" onclick="ins(activeInput,'abs(')">|·|</button>
+                        <button class="mkey" onclick="ins(activeInput,'pi')">π</button>
+                        <button class="mkey" onclick="ins(activeInput,'e')">e</button>
+                        <button class="mkey" onclick="ins(activeInput,'x*y')">x·y</button>
+                        <button class="mkey" onclick="ins(activeInput,'x^2+y^2')">x²+y²</button>
+                        <button class="mkey" onclick="ins(activeInput,'x^2-y^2')">x²−y²</button>
+                    </div>
+                </div>
+                <div id="err3d" class="errm hidden mt-2"></div>
+            </div>
+
+            <!-- 3D Main Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                <!-- Left: 3D chart + probe -->
+                <div class="xl:col-span-2 flex flex-col gap-4">
+                    <div class="glass rounded-xl overflow-hidden">
+                        <div
+                            class="px-4 py-2.5 border-b border-base-700/40 flex items-center justify-between flex-wrap gap-2">
+                            <span class="font-mono text-xs text-base-400 tracking-widest uppercase">Superficie 3D
+                                Interactiva</span>
+                            <div id="fdisplay3d" class="text-sm text-neon font-mono">f(x,y) = ...</div>
+                        </div>
+                        <div id="plt3d" class="plotc" style="height:480px"></div>
+                    </div>
+                    <!-- Probe -->
+                    <div id="probePanel" class="glass rounded-xl p-4">
+                        <div class="stitle">🔬 Sonda Interactiva — Punto (x₀, y₀)</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <label class="block font-mono text-xs text-base-400 mb-1">x₀ = <span id="pxval"
+                                        class="text-neon">0</span></label>
+                                <div class="flex gap-1 items-center">
+                                    <input id="pxsl" type="range" min="-3" max="3" step="0.1" value="0" class="flex-1"
+                                        oninput="syncProbeX(this.value)" />
+                                    <input id="pxnum" type="number" value="0" step="any"
+                                        class="mi px-2 py-1 w-20 text-center text-xs"
+                                        oninput="syncProbeX(this.value)" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-mono text-xs text-base-400 mb-1">y₀ = <span id="pyval"
+                                        class="text-neon">0</span></label>
+                                <div class="flex gap-1 items-center">
+                                    <input id="pysl" type="range" min="-3" max="3" step="0.1" value="0" class="flex-1"
+                                        oninput="syncProbeY(this.value)" />
+                                    <input id="pynum" type="number" value="0" step="any"
+                                        class="mi px-2 py-1 w-20 text-center text-xs"
+                                        oninput="syncProbeY(this.value)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <div class="rcard mb-0">
+                                <div class="rlabel"><span class="rdot d-neon"></span>f(x₀,y₀)</div>
+                                <div id="pfval" class="rval font-mono text-sm text-neon">—</div>
+                            </div>
+                            <div class="rcard mb-0">
+                                <div class="rlabel"><span class="rdot d-sky"></span>∂f/∂x</div>
+                                <div id="pfx" class="rval font-mono text-sm" style="color:#60A5FA">—</div>
+                            </div>
+                            <div class="rcard mb-0">
+                                <div class="rlabel"><span class="rdot d-gold"></span>∂f/∂y</div>
+                                <div id="pfy" class="rval font-mono text-sm" style="color:#FCD34D">—</div>
+                            </div>
+                            <div class="rcard mb-0">
+                                <div class="rlabel"><span class="rdot d-violet"></span>|∇f|</div>
+                                <div id="pgm" class="rval font-mono text-sm" style="color:#C4B5FD">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Tabs 3D -->
+                <div class="flex flex-col gap-3">
+                    <div class="tabbar" id="tab3d">
+                        <button class="tbtn active" data-t3="parciales" onclick="tab3d(this)">∂ Parciales</button>
+                        <button class="tbtn" data-t3="hessiana" onclick="tab3d(this)">Hessiana</button>
+                        <button class="tbtn" data-t3="tangente" onclick="tab3d(this)">Plano Tang.</button>
+                        <button class="tbtn" data-t3="vectorial" onclick="tab3d(this)">Vectorial</button>
+                        <button class="tbtn" data-t3="jacobscalar" onclick="tab3d(this)">Jacobiana</button>
+                        <button class="tbtn" data-t3="limites" onclick="tab3d(this)">Límites</button>
+                        <button class="tbtn" data-t3="optim" onclick="tab3d(this)">Optim.</button>
+                        <button class="tbtn" data-t3="prop" onclick="tab3d(this)">Propiedades</button>
+                    </div>
+
+                    <div id="p3-parciales" class="panel active glass rounded-xl p-4 fin">
+                        <div class="stitle flex items-center w-full">Derivadas Parciales y Jacobiano Escalar <button
+                                class="ibtn"
+                                onclick="showTheory('Gradiente y Parciales', 'La derivada parcial mide cuánto de la función cambia en dirección a una sola variable asumiendo la otra constante. Al conjugarse conforman el vector Gradiente ($\\nabla f$), que apunta siempre en la dirección de la subida más pronunciada de f(x,y). Para campos escalares, el Gradiente sirve como matriz Jacobiana (de factor 1x2).')">i</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>∂f/∂x</div>
+                            <div id="pfxsym" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>∂f/∂y</div>
+                            <div id="pfysym" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>∇f — Gradiente</div>
+                            <div class="rval text-xs mb-1">$$\nabla f=\frac{\partial f}{\partial
+                                x}\hat{i}+\frac{\partial f}{\partial y}\hat{j}$$</div>
+                            <div id="grad3d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Derivadas 2ª orden</div>
+                            <div id="fxx3d" class="rval text-xs">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-hessiana" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Matriz Hessiana y Puntos Críticos</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Matriz Hessiana H(f) — Simbólica</div>
+                            <div class="rval text-xs mb-2">
+                                $$H=\begin{pmatrix}f_{xx}&f_{xy}\\f_{yx}&f_{yy}\end{pmatrix}$$</div>
+                            <div id="hesmat" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>det(H) = f_xx·f_yy − f_xy² — Expresión
+                            </div>
+                            <div id="hesdet" class="rval text-sm font-mono">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>det(H) en puntos críticos (valor
+                                numérico)</div>
+                            <div id="hesdetnum" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Puntos Críticos ∇f=0</div>
+                            <div id="crit3d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Clasificación</div>
+                            <div id="class3d" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-tangente" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Plano Tangente en (x₀, y₀)</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Ecuación del plano</div>
+                            <div class="rval text-xs mb-1">$$z-f(x_0,y_0)=f_x(x_0,y_0)(x-x_0)+f_y(x_0,y_0)(y-y_0)$$
+                            </div>
+                            <div id="tanplane" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Vector Normal n⃗ = (−f_x, −f_y, 1)</div>
+                            <div id="normvec" class="rval font-mono text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Linealización L(x,y)</div>
+                            <div id="linear3d" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-vectorial" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Análisis de Campos Vectoriales</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-coral"></span>Campo F⃗ = Pî + Qĵ</div>
+                            <div id="vfdisp" class="rval text-sm">Activa modo Vector arriba</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Divergencia ∇·F</div>
+                            <div class="rval text-xs mb-1">$$\nabla\cdot\vec{F}=\frac{\partial P}{\partial
+                                x}+\frac{\partial Q}{\partial y}$$</div>
+                            <div id="diverg" class="rval text-sm font-mono">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Rotacional ∇×F</div>
+                            <div class="rval text-xs mb-1">$$(\nabla\times\vec{F})\cdot\hat{k}=\frac{\partial
+                                Q}{\partial x}-\frac{\partial P}{\partial y}$$</div>
+                            <div id="curl3d" class="rval text-sm font-mono">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Tipo de Campo</div>
+                            <div id="ftype" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Jacobiana J(F) — Vectorial</div>
+                            <div class="rval text-xs mb-1">$$J=\begin{pmatrix}\partial P/\partial x & \partial
+                                P/\partial y \\ \partial Q/\partial x & \partial Q/\partial y\end{pmatrix}$$</div>
+                            <div id="jacob3d" class="rval text-sm font-mono">—</div>
+                            <div id="jacobdet3d" class="rval text-sm mt-1 pt-1 border-t border-base-700/50">det(J) = —
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jacobian for scalar functions -->
+                    <div id="p3-jacobscalar" class="panel glass rounded-xl p-4">
+                        <div class="stitle flex items-center w-full">Jacobiana Escalar $1\times2$ <button class="ibtn"
+                                onclick="showTheory('Jacobiana Escalar', 'Para una función escalar $f(x,y)$, la Jacobiana es una matriz $1\\times 2$ equivalente al Gradiente transpuesto:\\n$$J_f = \\nabla f^T = \\begin{pmatrix}\\partial f/\\partial x & \\partial f/\\partial y\\end{pmatrix}$$\\nEsta Jacobiana representa la transformación lineal de la función en cada punto.')">i</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>J_f = [∂f/∂x, ∂f/∂y]</div>
+                            <div id="jacobscalar" class="rval text-sm font-mono">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Evaluada en el punto sonda (x₀, y₀)
+                            </div>
+                            <div id="jacobscalarnum" class="rval text-sm font-mono">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-limites" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Análisis de Límites Multivariable</div>
+                        <p class="text-xs text-base-400 mb-3 font-mono">Comportamiento de f(x,y) en el punto (x₀,y₀) por
+                            distintas trayectorias</p>
+                        <div class="flex gap-2 mb-3">
+                            <div class="flex-1"><label
+                                    class="block font-mono text-xs text-base-400 mb-1">x₀</label><input id="limx0"
+                                    type="number" value="0" class="mi px-3 py-2 w-full text-sm text-center" /></div>
+                            <div class="flex-1"><label
+                                    class="block font-mono text-xs text-base-400 mb-1">y₀</label><input id="limy0"
+                                    type="number" value="0" class="mi px-3 py-2 w-full text-sm text-center" /></div>
+                            <button class="btnp px-3 py-2 text-xs self-end" onclick="analyzeLim3D()">→</button>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Por eje x (y=y₀)</div>
+                            <div id="limx" class="rval font-mono text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Por eje y (x=x₀)</div>
+                            <div id="limy" class="rval font-mono text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Por diagonal y=x</div>
+                            <div id="limd" class="rval font-mono text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Por parábola y=x²</div>
+                            <div id="limp" class="rval font-mono text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-plasma"></span>Conclusión</div>
+                            <div id="limc" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-optim" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Optimización — Criterio Hessiano</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-gold"></span>Regla de clasificación</div>
+                            <div class="rval text-xs mb-2">$$D=f_{xx}f_{yy}-f_{xy}^2$$</div>
+                            <ul class="rval text-xs space-y-1 text-base-400">
+                                <li>• D&gt;0, f_xx&gt;0 → <span class="text-neon">Mínimo Local</span></li>
+                                <li>• D&gt;0, f_xx&lt;0 → <span class="text-plasma">Máximo Local</span></li>
+                                <li>• D&lt;0 → <span style="color:#FCD34D">Punto de Silla</span></li>
+                                <li>• D=0 → Test inconcluso</li>
+                            </ul>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Puntos Encontrados</div>
+                            <div id="optlist" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-violet"></span>Multiplicadores de Lagrange</div>
+                            <div class="rval text-xs">$$\nabla f=\lambda\nabla g\Rightarrow\begin{cases}f_x=\lambda
+                                g_x\\f_y=\lambda g_y\\g(x,y)=c\end{cases}$$</div>
+                        </div>
+                    </div>
+
+                    <div id="p3-prop" class="panel glass rounded-xl p-4">
+                        <div class="stitle">Propiedades y Cortes 3D</div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-neon"></span>Corte con el Eje Z</div>
+                            <div id="cortesz3d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="rcard">
+                            <div class="rlabel"><span class="rdot d-sky"></span>Paridad</div>
+                            <div id="paridad3d" class="rval text-sm">—</div>
+                        </div>
+                        <div class="stitle mt-4">Derivabilidad y Continuidad en (x₀, y₀)</div>
+                        <div class="flex gap-2 mb-3">
+                            <div class="flex-1"><label
+                                    class="block font-mono text-xs text-base-400 mb-1">x₀</label><input id="deriv3dx0"
+                                    type="number" value="0" class="mi px-3 py-2 w-full text-sm text-center" /></div>
+                            <div class="flex-1"><label
+                                    class="block font-mono text-xs text-base-400 mb-1">y₀</label><input id="deriv3dy0"
+                                    type="number" value="0" class="mi px-3 py-2 w-full text-sm text-center" /></div>
+                            <button class="btnp px-3 py-2 self-end text-xs" onclick="checkDeriv3D()">Evaluar</button>
+                        </div>
+                        <div class="rcard">
+                            <div id="derivres3d" class="rval text-sm">—</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- END 3D -->
+
+        <!-- MODAL -->
+        <div id="infoModal" class="modal" onclick="closeTheory(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="stitle flex items-center gap-2" style="font-size:0.85rem; border-bottom:0; color:#00F5A0;">
+                    <span class="rdot d-neon"></span> <span id="mTitle">Teoría</span>
+                </div>
+                <div id="mDesc" class="text-sm text-base-300 mt-2 font-mono" style="line-height:1.7">...</div>
+                <div class="mt-4 flex justify-end"><button class="btnp px-5 py-2 text-xs"
+                        onclick="closeTheory(event)">Cerrar</button></div>
+            </div>
+        </div>
+
+        <!-- APP CENTER MODAL -->
+        <div id="appCenterModal" class="modal" onclick="event.target===this ? this.style.display='none' : null">
+            <div class="modal-content !max-w-xl" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4 border-b border-base-700/50 pb-2">
+                    <div class="font-mono font-bold text-neon text-lg flex items-center gap-2">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                            <rect x="9" y="9" width="6" height="6"></rect>
+                            <line x1="9" y1="1" x2="9" y2="4"></line>
+                        </svg>
+                        Centro de Aplicaciones
+                    </div>
+                    <button class="text-base-400 hover:text-white" onclick="document.getElementById('appCenterModal').style.display='none'">✕</button>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- PWA Section -->
+                    <div class="p-4 rounded-xl bg-base-800 border border-base-700/50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-2xl">📱</span>
+                            <div>
+                                <h3 class="font-bold text-white text-sm">App Nativa PWA</h3>
+                                <p class="text-xs text-base-400 mt-1">Instala MathLab directamente para que funcione en pantalla completa, de forma rápida, segura y 100% Offline.</p>
+                            </div>
+                        </div>
+                        <div id="pwa-install-container" class="mt-3 hidden">
+                            <button id="pwa-install-btn" class="w-full py-2 bg-gradient-to-r from-[#00F5A0] to-[#00C67F] hover:scale-[1.02] text-base-950 font-bold rounded-lg text-sm transition-transform shadow-[0_4px_15px_rgba(0,245,160,0.2)]">
+                                Instalar App en este dispositivo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Windows Section -->
+                    <div class="p-4 rounded-xl bg-base-800 border border-base-700/50">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-sky mt-1 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M0,0H11.37V11.37H0ZM12.62,0H24V11.37H12.62ZM0,12.62H11.37V24H0ZM12.62,12.62H24V24H12.62Z"></path></svg>
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Windows & Desktop (Alternativa)</h3>
+                                <p class="text-xs text-base-400 mt-1">Si no aparece el botón de instalación arriba, busca el icono de <span class="bg-base-700 px-1 rounded inline-block text-[0.6rem]">Instalar (⬇)</span> en la barra superior de direcciones (URL) de Google Chrome o Microsoft Edge. Se añadirá como programa a tu ordenador.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <!-- Android Manifest Backup -->
+                        <button onclick="downloadManifest()" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-base-800 border border-base-700/50 hover:bg-base-700 hover:border-sky transition-colors text-left group">
+                            <span class="text-3xl group-hover:scale-110 transition-transform">🤖</span>
+                            <span class="text-xs font-bold text-white tracking-wide mt-1">Descargar Manifest</span>
+                            <span class="text-[0.65rem] text-base-400 text-center leading-tight">Archivo PWA (.json) necesario para integrar en móviles.</span>
+                        </button>
+
+                        <!-- Source Offline Backup -->
+                        <button onclick="downloadSource()" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-base-800 border border-base-700/50 hover:bg-base-700 hover:border-neon transition-colors text-left group">
+                            <span class="text-3xl group-hover:scale-110 transition-transform">💾</span>
+                            <span class="text-xs font-bold text-white tracking-wide mt-1">Descargar Offline</span>
+                            <span class="text-[0.65rem] text-base-400 text-center leading-tight">Código Fuente (.html) para tener backup local portable.</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- PWA Install FAB -->
+    <button id="fabInstall" class="hidden fixed bottom-6 right-6 z-[99] bg-[#00F5A0] hover:bg-[#00C67F] text-[#04060E] p-4 rounded-full shadow-[0_4px_15px_rgba(0,245,160,0.5)] transition-transform hover:scale-110 items-center justify-center">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+    </button>
+
+    <footer class="text-center py-4 text-base-500 font-mono text-xs mt-4">MathLab Suite v3.0 — math.js · plotly.js ·
+        mathjax · PWA</footer>
+
+    <script>
+        // ──────────────────────────────────────────────────────────
+        // STATE
+        // ──────────────────────────────────────────────────────────
+        let mode = '2d';
+        let mode3 = 'scalar';
+        let activeInput = 'fi2d';
+        let plt2init = false, plt3init = false;
+        let s2 = { expr: '', d1: null, d2: null, d3: null, xMin: -5, xMax: 5 };
+        let s3 = { expr: '', fx: null, fy: null, fxx: null, fyy: null, fxy: null, xMin: -3, xMax: 3, yMin: -3, yMax: 3 };
+
+        // ──────────────────────────────────────────────────────────
+        // UTILS
+        // ──────────────────────────────────────────────────────────
+        const R = (v, d = 5) => isFinite(v) ? Math.round(v * 10 ** d) / 10 ** d : v;
+
+        // Soporte real para bases negativas con exponentes fraccionarios (ej. x^(1/3))
+        const _origPow = math.pow;
+        math.import({
+            pow: function (x, y) {
+                if (typeof x === 'number' && typeof y === 'number' && x < 0) {
+                    for(let q = 1; q <= 99; q += 2) {
+                        const p = y * q;
+                        if (Math.abs(Math.round(p) - p) < 1e-10) {
+                            const res = Math.pow(-x, Math.abs(y));
+                            const sign = (Math.round(p) % 2 !== 0) ? -1 : 1;
+                            return y < 0 ? sign / res : sign * res;
+                        }
+                    }
+                }
+                return _origPow(x, y);
+            }
+        }, { override: true });
+
+        const se1 = (e, x) => { try { const res = math.evaluate(e, { x }); return typeof res === 'object' ? NaN : res; } catch { return NaN } };
+        const se2 = (e, x, y) => { try { const res = math.evaluate(e, { x, y }); return typeof res === 'object' ? NaN : res; } catch { return NaN } };
+        const rng = (a, b, n = 600) => { const r = [], h = (b - a) / n; for (let i = 0; i <= n; i++)r.push(a + i * h); return r; };
+        const ntl = n => { try { return n.toTex({ parenthesis: 'auto' }) } catch { return n.toString() } };
+        const fl = e => { try { return math.parse(e).toTex({ parenthesis: 'auto' }) } catch { return e } };
+        const mj = async el => { if (window.MathJax && MathJax.typesetPromise) await MathJax.typesetPromise([el]) };
+
+        // ──────────────────────────────────────────────────────────
+        // APP CENTER & PWA LOGIC
+        // ──────────────────────────────────────────────────────────
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const container = document.getElementById('pwa-install-container');
+            const btn = document.getElementById('pwa-install-btn');
+            const fab = document.getElementById('fabInstall');
+            
+            const handleInstall = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        if (container) container.classList.add('hidden');
+                        if (fab) fab.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            };
+
+            if (container && btn) {
+                container.classList.remove('hidden');
+                btn.onclick = handleInstall;
+            }
+            if (fab) {
+                fab.style.display = 'flex';
+                fab.onclick = handleInstall;
+            }
+        });
+
+        function downloadManifest() {
+            const manifest = {
+                "name": "MathLab Suite Pro",
+                "short_name": "MathLab",
+                "description": "Suite avanzada de análisis matemático 2D/3D",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#04060E",
+                "theme_color": "#080C18",
+                "icons": [
+                    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%23080C18'/%3E%3Cpath fill='%2300F5A0' d='M6.5 17.5l4-10.5h3l4 10.5h-2.5l-1-2.5h-4l-1 2.5h-2.5zm4.5-4.5h2.5l-1.25-3.5L11 13z'/%3E%3C/svg%3E", "sizes": "512x512", "type": "image/svg+xml" }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'manifest.json';
+            a.click();
+        }
+
+        function downloadSource() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob(['<!DOCTYPE html>\n<html lang="es" class="dark">\n' + html.substring(html.indexOf('<head>'))], { type: 'text/html;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'MathLab_Portable.html';
+            a.click();
+            
+            // Re-hide modal after download
+            document.getElementById('appCenterModal').style.display = 'none';
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // EXPRESSION PARSERS (Piecewise)
+        // ──────────────────────────────────────────────────────────
+        function parsePW(raw) {
+            if (!raw.includes(';')) return raw;
+            const pieces = raw.split(';').map(s => s.trim());
+            let expr = 'NaN';
+            for (let i = pieces.length - 1; i >= 0; i--) {
+                const p = pieces[i];
+                const m = p.match(/^(.+?)\s+(?:si|if|cuando|when)\s+(.+)$/i);
+                if (m) {
+                    const f = m[1].trim(), c = m[2].trim();
+                    expr = i === pieces.length - 1 ? `(${f})` : `((${c})?(${f}):(${expr}))`;
+                } else {
+                    expr = i === pieces.length - 1 ? `(${p})` : `((true)?(${p}):(${expr}))`;
+                }
+            }
+            return expr;
+        }
+
+        function derivePW(raw, varName = 'x') {
+            if (!raw.includes(';')) return math.simplify(math.derivative(math.parse(raw), varName)).toString();
+            const pieces = raw.split(';').map(s => s.trim());
+            const derivedPieces = pieces.map(p => {
+                const m = p.match(/^(.+?)\s+(?:si|if|cuando|when)\s+(.+)$/i);
+                if (m) {
+                    const f = m[1].trim(), c = m[2].trim();
+                    let df;
+                    try { df = math.simplify(math.derivative(math.parse(f), varName)).toString(); } catch { df = '0'; }
+                    return `${df} si ${c}`;
+                } else {
+                    let df;
+                    try { df = math.simplify(math.derivative(math.parse(p), varName)).toString(); } catch { df = '0'; }
+                    return df;
+                }
+            });
+            return derivedPieces.join('; ');
+        }
+
+        function checkDeriv2D() {
+            if (!s2.expr) return;
+            const x0 = parseFloat(document.getElementById('derivx0').value) || 0;
+            const h = 1e-6;
+            const f0 = se1(s2.expr, x0);
+            if (!isFinite(f0)) { document.getElementById('derivres2d').innerHTML = '<span class="tag tp">La función no está definida en x₀</span>'; return; }
+            const derL = (f0 - se1(s2.expr, x0 - h)) / h;
+            const derR = (se1(s2.expr, x0 + h) - f0) / h;
+            if (!isFinite(derL) || !isFinite(derR)) { document.getElementById('derivres2d').innerHTML = '<span class="tag tp">No derivable (límite no finito)</span>'; return; }
+            if (Math.abs(derL - derR) < 1e-3) {
+                document.getElementById('derivres2d').innerHTML = `<span class="tag tn">✓ Derivable en x₀ = ${x0}</span><br>Derivada ≈ ${R((derL + derR) / 2, 4)}`;
+            } else {
+                document.getElementById('derivres2d').innerHTML = `<span style="border:1px solid #FCD34D;color:#FCD34D" class="tag">⚠ No derivable en x₀ = ${x0}</span><br>Derivada izq ≈ ${R(derL, 4)} ≠ Derivada der ≈ ${R(derR, 4)}`;
+            }
+        }
+
+        function checkDeriv3D() {
+            if (!s3.expr) return;
+            const x0 = parseFloat(document.getElementById('deriv3dx0').value) || 0;
+            const y0 = parseFloat(document.getElementById('deriv3dy0').value) || 0;
+            const h = 1e-5;
+            const f0 = se2(s3.expr, x0, y0);
+            if (!isFinite(f0)) { document.getElementById('derivres3d').innerHTML = '<span class="tag tp">Función no definida en (x₀, y₀)</span>'; return; }
+
+            const fxL = (f0 - se2(s3.expr, x0 - h, y0)) / h, fxR = (se2(s3.expr, x0 + h, y0) - f0) / h;
+            const fyL = (f0 - se2(s3.expr, x0, y0 - h)) / h, fyR = (se2(s3.expr, x0, y0 + h) - f0) / h;
+
+            const diffx = isFinite(fxL) && isFinite(fxR) && Math.abs(fxL - fxR) < 1e-2;
+            const diffy = isFinite(fyL) && isFinite(fyR) && Math.abs(fyL - fyR) < 1e-2;
+
+            if (diffx && diffy) {
+                document.getElementById('derivres3d').innerHTML = `<span class="tag tn">✓ Posiblemente derivable en (${x0}, ${y0})</span><br>∂f/∂x ≈ ${R((fxL + fxR) / 2, 4)}<br>∂f/∂y ≈ ${R((fyL + fyR) / 2, 4)}`;
+            } else {
+                document.getElementById('derivres3d').innerHTML = `<span class="tag tp">✗ No derivable en (${x0}, ${y0})</span><br>Límites parciales difieren.`;
+            }
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // MATH KEYBOARD
+        // ──────────────────────────────────────────────────────────
+        function ins(id, sym) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.focus();
+            const s = el.selectionStart || 0, e = el.selectionEnd || 0, v = el.value;
+            el.value = v.slice(0, s) + sym + v.slice(e);
+            const p = s + sym.length; el.setSelectionRange(p, p);
+        }
+        function insPiece() { document.getElementById('fi2d').value = 'x^2 si x<0; sqrt(x) si x>=0'; }
+
+        // CALCULATOR KEYBOARD
+        let _calcBuf = '';
+        function calcKb(k) {
+            const disp = document.getElementById('calcin-disp');
+            const out = document.getElementById('calcout');
+            if (k === 'clear') { _calcBuf = ''; disp.textContent = ''; out.textContent = '—'; out.style.color = '#00F5A0'; return; }
+            if (k === 'del') { _calcBuf = _calcBuf.slice(0, -1); }
+            else if (k === '(') {
+                // Smart parenthesis: close if open paren count > close
+                const opens = (_calcBuf.match(/\(/g) || []).length, closes = (_calcBuf.match(/\)/g) || []).length;
+                _calcBuf += opens > closes ? ')' : '(';
+            }
+            else if (k === '=') {
+                try {
+                    const expr = _calcBuf.replace(/log\(/g, 'log(').replace(/log10\(/g, 'log10(');
+                    let r = math.evaluate(expr);
+                    const formatted = formatCalcResult(r);
+                    out.innerHTML = formatted;
+                    out.style.color = '#00F5A0';
+                    _calcBuf = '';
+                    disp.textContent = '';
+                } catch (e) { out.textContent = 'Error'; out.style.color = '#FF6B6B'; }
+                return;
+            }
+            else { _calcBuf += k; }
+            disp.textContent = _calcBuf;
+            // Live evaluate
+            if (_calcBuf) {
+                try {
+                    const r = math.evaluate(_calcBuf);
+                    out.innerHTML = formatCalcResult(r);
+                    out.style.color = '#00F5A0';
+                } catch { out.textContent = '...'; out.style.color = '#4A5568'; }
+            } else { out.textContent = '—'; out.style.color = '#4A5568'; }
+        }
+
+        function formatCalcResult(r) {
+            if (typeof r === 'object' && r !== null) {
+                // Matrix / array
+                if (Array.isArray(r) && Array.isArray(r[0])) {
+                    // 2D matrix - render as table
+                    const rows = r.map(row =>
+                        '<tr>' + row.map(cell => `<td class="px-2 py-0.5 text-center font-mono border border-base-700/50" style="color:#00F5A0">${typeof cell === 'object' ? math.format(cell, { precision: 6 }) : R(cell, 6)}</td>`).join('') + '</tr>'
+                    ).join('');
+                    return `<table class="text-xs mx-auto mt-1">${rows}</table>`;
+                } else if (Array.isArray(r)) {
+                    // 1D vector
+                    return `<span style="color:#60A5FA">[${r.map(v => typeof v === 'object' ? math.format(v, { precision: 6 }) : R(v, 6)).join(', ')}]</span>`;
+                } else {
+                    return math.format(r, { precision: 10 });
+                }
+            }
+            return math.format(r, { precision: 14 });
+        }
+
+        function calcEx(s) {
+            _calcBuf = s;
+            document.getElementById('calcin-disp').textContent = s;
+            try {
+                const r = math.evaluate(s);
+                document.getElementById('calcout').innerHTML = formatCalcResult(r);
+                document.getElementById('calcout').style.color = '#00F5A0';
+            } catch (e) { document.getElementById('calcout').textContent = e.message; document.getElementById('calcout').style.color = '#FF6B6B'; }
+        }
+
+        function syncProbeX(v) {
+            document.getElementById('pxsl').value = v;
+            document.getElementById('pxnum').value = v;
+            updateProbe();
+        }
+        function syncProbeY(v) {
+            document.getElementById('pysl').value = v;
+            document.getElementById('pynum').value = v;
+            updateProbe();
+        }
+
+        // Calculator
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('calcin').addEventListener('input', e => {
+                const val = e.target.value.trim(), el = document.getElementById('calcout');
+                if (!val) { el.textContent = '—'; el.className = 'rval text-lg break-all text-base-400'; return; }
+                try {
+                    const r = math.evaluate(val);
+                    el.textContent = typeof r === 'function' ? '[Función]' : math.format(r, { precision: 14 });
+                    el.className = 'rval text-lg break-all text-neon font-mono';
+                } catch { el.textContent = 'Expresión no válida…'; el.className = 'rval text-lg break-all text-base-500'; }
+            });
+        });
+
+        // ──────────────────────────────────────────────────────────
+        // MODE / TAB
+        // ──────────────────────────────────────────────────────────
+        function toggleMode() {
+            mode = mode === '2d' ? '3d' : '2d';
+            document.getElementById('mode2d').classList.toggle('hidden', mode !== '2d');
+            document.getElementById('mode3d').classList.toggle('hidden', mode !== '3d');
+            const sl = document.getElementById('togSlide');
+            const l2 = document.getElementById('lbl2d'), l3 = document.getElementById('lbl3d');
+            if (mode === '3d') { sl.classList.add('right'); l2.className = 'toglabel text-base-500'; l3.className = 'toglabel text-neon'; }
+            else { sl.classList.remove('right'); l2.className = 'toglabel text-neon'; l3.className = 'toglabel text-base-500'; }
+        }
+        function set3DMode(m) {
+            mode3 = m;
+            document.getElementById('inp3ds').classList.toggle('hidden', m !== 'scalar');
+            document.getElementById('inp3dv').classList.toggle('hidden', m !== 'vector');
+            document.getElementById('probePanel').classList.toggle('hidden', m !== 'scalar');
+            document.getElementById('bscalar').className = m === 'scalar' ? 'btnp px-4 py-1.5 text-xs' : 'btng px-4 py-1.5 text-xs';
+            document.getElementById('bvector').className = m === 'vector' ? 'btnp px-4 py-1.5 text-xs' : 'btng px-4 py-1.5 text-xs';
+            if (m === 'vector') tab3d(document.querySelector('[data-t3="vectorial"]'));
+        }
+        function tab2d(btn) {
+            document.querySelectorAll('#tab2d .tbtn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[id^="p2-"]').forEach(p => { p.classList.remove('active'); });
+            btn.classList.add('active');
+            const p = document.getElementById('p2-' + btn.dataset.t);
+            if (p) { p.classList.add('active'); p.classList.add('fin'); }
+        }
+        function tab3d(btn) {
+            document.querySelectorAll('#tab3d .tbtn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[id^="p3-"]').forEach(p => { p.classList.remove('active'); });
+            btn.classList.add('active');
+            const p = document.getElementById('p3-' + btn.dataset.t3);
+            if (p) { p.classList.add('active'); p.classList.add('fin'); }
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // NUMERICAL HELPERS
+        // ──────────────────────────────────────────────────────────
+        function roots(fn, a, b, steps = 1200) {
+            const rs = [], h = (b - a) / steps; let prev = fn(a);
+            for (let i = 1; i <= steps; i++) {
+                const x = a + i * h, cur = fn(x);
+                if (!isFinite(prev) || !isFinite(cur)) { prev = cur; continue; }
+                if (prev * cur <= 0) {
+                    let lo = x - h, hi = x;
+                    for (let j = 0; j < 60; j++) { const m = (lo + hi) / 2, fm = fn(m); if (Math.abs(fm) < 1e-12 || (hi - lo) < 1e-12) { lo = m; break; } fn(lo) * fm < 0 ? (hi = m) : (lo = m); }
+                    const r = R((lo + hi) / 2, 5);
+                    if (!rs.some(v => Math.abs(v - r) < 0.005)) rs.push(r);
+                }
+                prev = cur;
+            }
+            return rs;
+        }
+        function simpson(fn, a, b, n = 1000) {
+            if (n % 2 !== 0) n++;
+            const h = (b - a) / n; let s = fn(a) + fn(b);
+            for (let i = 1; i < n; i++) { const v = fn(a + i * h); if (!isFinite(v)) return null; s += (i % 2 === 0 ? 2 : 4) * v; }
+            return (h / 3) * s;
+        }
+        const ndx = (e, x, y, h = 1e-6) => (se2(e, x + h, y) - se2(e, x - h, y)) / (2 * h);
+        const ndy = (e, x, y, h = 1e-6) => (se2(e, x, y + h) - se2(e, x, y - h)) / (2 * h);
+
+        // ──────────────────────────────────────────────────────────
+        // BUILD 2D CHART
+        // ──────────────────────────────────────────────────────────
+        function buildChart2D(expr, rMin, rMax, tanA, discs, asym, rMode) {
+            let xs = [];
+            if (rMode === 'inf') {
+                for (let i = -100; i <= 100; i++) xs.push(i * 0.5);
+                for (let i = -1000; i <= -100; i += 20) xs.push(i);
+                for (let i = 100; i <= 1000; i += 20) xs.push(i);
+                for (let i = -1e4; i <= -1000; i += 500) xs.push(i);
+                for (let i = 1000; i <= 1e4; i += 500) xs.push(i);
+                xs.sort((a, b) => a - b);
+            } else {
+                xs = rng(rMin, rMax, 800);
+            }
+
+            const ys = xs.map(x => { if (discs.some(p => Math.abs(x - p) < 0.05)) return null; const y = se1(expr, x); return isFinite(y) ? y : null; });
+            const traces = [];
+            traces.push({ x: xs, y: ys, type: 'scatter', mode: 'lines', name: 'f(x)', line: { color: '#00F5A0', width: 2.5 }, hovertemplate: '<b>x=%{x:.4f}</b><br>f(x)=%{y:.4f}<extra></extra>' });
+            const vy = ys.filter(y => y !== null && isFinite(y)).sort((a, b) => a - b);
+            discs.forEach(p => {
+                const yr = vy.length ? [vy[0] * 1.2, vy[vy.length - 1] * 1.2] : [-10, 10];
+                traces.push({ x: [p, p], y: yr, type: 'scatter', mode: 'lines', name: `A.V. x=${p}`, line: { color: '#FF6B6B', width: 1, dash: 'dash' }, hoverinfo: 'name' });
+            });
+            if (asym.h !== null) traces.push({ x: [rMin, rMax], y: [asym.h, asym.h], type: 'scatter', mode: 'lines', name: `A.H. y=${asym.h}`, line: { color: '#C4B5FD', width: 1, dash: 'dot' }, hoverinfo: 'name' });
+            if (asym.obl) { const { m, b } = asym.obl; traces.push({ x: [rMin, rMax], y: [m * rMin + b, m * rMax + b], type: 'scatter', mode: 'lines', name: `A.O. y=${m}x+${b}`, line: { color: '#FCD34D', width: 1, dash: 'dashdot' }, hoverinfo: 'name' }); }
+            if (tanA !== null && s2.d1) {
+                const fa = se1(expr, tanA), dfa = se1(s2.d1.toString(), tanA);
+                if (isFinite(fa) && isFinite(dfa)) {
+                    const b = fa - dfa * tanA;
+                    traces.push({ x: [rMin, rMax], y: [dfa * rMin + b, dfa * rMax + b], type: 'scatter', mode: 'lines', name: 'Tangente', line: { color: '#60A5FA', width: 2 }, hoverinfo: 'none' });
+                    traces.push({ x: [tanA], y: [fa], type: 'scatter', mode: 'markers', name: 'Tangencia', marker: { color: '#60A5FA', size: 10, symbol: 'circle', line: { color: '#04060E', width: 2 } }, hovertemplate: `<b>(${tanA}, ${R(fa, 4)})</b><extra>Tangencia</extra>` });
+                }
+            }
+            let yMin = -10, yMax = 10;
+            if (rMode === 'inf') {
+                // Compute a sensible Y window from visible points (|x| <= 20)
+                const visY = xs.map((x, i) => (Math.abs(x) <= 20 && ys[i] !== null) ? ys[i] : null)
+                    .filter(v => v !== null && isFinite(v)).sort((a, b) => a - b);
+                if (visY.length > 4) {
+                    const q1 = visY[Math.floor(visY.length * 0.05)];
+                    const q3 = visY[Math.floor(visY.length * 0.95)];
+                    const iq = Math.max(q3 - q1, 1) * 1.4;
+                    yMin = Math.max(q1 - iq, -1000);
+                    yMax = Math.min(q3 + iq, 1000);
+                } else {
+                    yMin = -100; yMax = 100;
+                }
+            } else if (vy.length > 10) {
+                const q1 = vy[Math.floor(vy.length * .05)], q3 = vy[Math.floor(vy.length * .95)], iq = q3 - q1 || 5, pd = iq * .2;
+                yMin = q1 - iq * 1.2 - pd; yMax = q3 + iq * 1.2 + pd;
+            } else if (vy.length > 0) { yMin = vy[0] - 5; yMax = vy[vy.length - 1] + 5; }
+
+            const xInitRange = rMode === 'inf' ? [-50, 50] : null;
+
+            const layout = {
+                paper_bgcolor: '#080C18', plot_bgcolor: '#04060E',
+                font: { family: 'Space Mono,monospace', color: '#4A5568', size: 10 },
+                margin: { t: 15, r: 15, b: 40, l: 55 },
+                showlegend: true,
+                legend: { bgcolor: 'rgba(8,12,24,.85)', bordercolor: '#1A2236', borderwidth: 1, font: { size: 9 }, x: .01, y: .99 },
+                xaxis: {
+                    gridcolor: '#0F1626', zerolinecolor: '#273048', zerolinewidth: 2,
+                    tickcolor: '#1A2236', color: '#4A5568', fixedrange: false,
+                    range: xInitRange,
+                    title: { text: 'x', font: { color: '#4A5568' } },
+                    spikethickness: 1, spikecolor: '#00F5A0', spikemode: 'across', spikesnap: 'cursor'
+                },
+                yaxis: {
+                    gridcolor: '#0F1626', zerolinecolor: '#273048', zerolinewidth: 2,
+                    tickcolor: '#1A2236', color: '#4A5568', fixedrange: false,
+                    range: [yMin, yMax],
+                    title: { text: 'f(x)', font: { color: '#4A5568' } },
+                    scaleanchor: 'x',
+                    scaleratio: 1
+                },
+                hovermode: 'x unified',
+                hoverlabel: { bgcolor: '#0F1626', bordercolor: '#00F5A0', font: { family: 'Space Mono,monospace', size: 10 } },
+                dragmode: 'pan'
+            };
+            const cfg = {
+                displayModeBar: true,
+                modeBarButtonsToRemove: ['sendDataToCloud', 'lasso2d', 'select2d'],
+                modeBarButtonsToAdd: ['drawline', 'eraseshape'],
+                displaylogo: false,
+                responsive: true,
+                scrollZoom: true,
+                doubleClick: 'reset'
+            };
+            plt2init ? Plotly.react('plt2d', traces, layout, cfg) : Plotly.newPlot('plt2d', traces, layout, cfg);
+            plt2init = true;
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // BUILD 3D CHART
+        // ──────────────────────────────────────────────────────────
+        function build3D(expr, xMin, xMax, yMin, yMax, px, py, rMode) {
+            let xs, ys;
+            if (rMode === 'inf') {
+                xs = rng(-50, 50, 50); ys = rng(-50, 50, 50);
+            } else {
+                xs = rng(xMin, xMax, 50); ys = rng(yMin, yMax, 50);
+            }
+            const z = ys.map(y => xs.map(x => { const v = se2(expr, x, y); return isFinite(v) ? Math.max(-500, Math.min(500, v)) : null; }));
+            const traces = [{ type: 'surface', x: xs, y: ys, z, colorscale: [[0, '#0F1626'], [.2, '#1E3A5F'], [.4, '#00A67D'], [.6, '#00F5A0'], [.8, '#FCD34D'], [1, '#FF6B6B']], opacity: .88, showscale: true, colorbar: { thickness: 12, len: .6, x: 1.01, tickfont: { family: 'Space Mono', size: 9, color: '#4A5568' } }, hovertemplate: 'x=%{x:.3f}<br>y=%{y:.3f}<br>z=%{z:.4f}<extra>f(x,y)</extra>', contours: { z: { show: true, usecolormap: true, project: { z: true }, width: 1 } } }];
+            if (px !== undefined && py !== undefined && expr) {
+                const pz = se2(expr, px, py);
+                if (isFinite(pz)) {
+                    traces.push({ type: 'scatter3d', mode: 'markers+text', x: [px], y: [py], z: [pz], name: 'Sonda', marker: { color: '#00F5A0', size: 8, line: { color: '#04060E', width: 2 } }, text: [`(${R(px, 2)},${R(py, 2)},${R(pz, 3)})`], textposition: 'top center', textfont: { family: 'Space Mono', size: 9, color: '#00F5A0' }, hovertemplate: `Sonda: (${px},${py},${R(pz, 4)})<extra></extra>` });
+                    const fxv = ndx(expr, px, py), fyv = ndy(expr, px, py), pr = .8;
+                    const bx = [px - pr, px + pr, px + pr, px - pr], by = [py - pr, py - pr, py + pr, py + pr];
+                    const bz = bx.map((xi, i) => pz + fxv * (xi - px) + fyv * (by[i] - py));
+                    traces.push({ type: 'mesh3d', x: bx, y: by, z: bz, i: [0, 0], j: [1, 2], k: [2, 3], opacity: .3, color: '#60A5FA', name: 'Plano Tangente' });
+                }
+            }
+            const layout = { paper_bgcolor: '#080C18', scene: { xaxis: { gridcolor: '#1A2236', backgroundcolor: '#04060E', color: '#4A5568', showbackground: true, title: 'x' }, yaxis: { gridcolor: '#1A2236', backgroundcolor: '#04060E', color: '#4A5568', showbackground: true, title: 'y' }, zaxis: { gridcolor: '#1A2236', backgroundcolor: '#04060E', color: '#4A5568', showbackground: true, title: 'z' }, bgcolor: '#04060E', camera: { eye: { x: 1.5, y: 1.5, z: 1.2 } } }, font: { family: 'Space Mono,monospace', color: '#4A5568', size: 10 }, margin: { t: 15, r: 0, b: 15, l: 0 }, showlegend: false };
+            const cfg = { displayModeBar: true, displaylogo: false, responsive: true };
+            plt3init ? Plotly.react('plt3d', traces, layout, cfg) : Plotly.newPlot('plt3d', traces, layout, cfg);
+            plt3init = true;
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // TANGENT 2D
+        // ──────────────────────────────────────────────────────────
+        function tangentSlide(a) {
+            document.getElementById('tanxval').textContent = R(a, 3);
+            if (!s2.expr || !s2.d1) return;
+            const fa = se1(s2.expr, a), dfa = se1(s2.d1.toString(), a);
+            document.getElementById('tanfa').textContent = isFinite(fa) ? R(fa, 5) : '∄';
+            document.getElementById('tanslope').textContent = isFinite(dfa) ? R(dfa, 5) : '∄';
+            if (isFinite(fa) && isFinite(dfa)) {
+                const b = R(fa - dfa * a, 4), sg = b >= 0 ? `+ ${b}` : b < 0 ? `- ${Math.abs(b)}` : '';
+                document.getElementById('taneq2d').innerHTML = `$$y=${R(dfa, 4)}x ${sg}$$`;
+                mj(document.getElementById('taneq2d'));
+            }
+            const discs = domainDisc(s2.raw || s2.expr), asym = asymptotes(s2.expr, discs);
+            buildChart2D(s2.expr, s2.xMin, s2.xMax, a, discs, asym);
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // DOMAIN DISCONTINUITIES  (poles / vertical asymptotes)
+        // ──────────────────────────────────────────────────────────
+        function domainDisc(rawStr) {
+            const discs = [];
+            
+            function checkRoot(expStr) {
+                try {
+                    const fn = math.compile(expStr);
+                    const f = x => fn.evaluate({x});
+                    const found = roots(f, -100, 100, 1500);
+                    found.forEach(r => {
+                        const cr = R(r, 2);
+                        if (!discs.some(d => Math.abs(d - cr) < 0.05)) discs.push(+cr);
+                    });
+                } catch(e) {}
+            }
+
+            const pieces = rawStr.split(';');
+            pieces.forEach(p => {
+                const mathPart = p.replace(/\s+(?:si|if|cuando|when)\s+.*$/i, '').trim();
+                try {
+                    math.parse(mathPart).traverse(n => {
+                        if (n.type === 'OperatorNode' && n.op === '/') checkRoot(n.args[1].toString());
+                        else if (n.type === 'FunctionNode') {
+                            const fnName = n.fn.name || n.fn;
+                            if (['tan', 'sec'].includes(fnName)) checkRoot('cos(' + n.args[0].toString() + ')');
+                            if (['cot', 'csc'].includes(fnName)) checkRoot('sin(' + n.args[0].toString() + ')');
+                            if (['log', 'log10', 'ln', 'sqrt'].includes(fnName)) checkRoot(n.args[0].toString());
+                        }
+                    });
+                } catch(e) {}
+            });
+
+            if (rawStr.includes('si ')) {
+                const matches = rawStr.match(/(?:<|>|<=|>=|==)\s*(-?\d+(\.\d+)?)/g);
+                if (matches) {
+                    const compiled = parsePW(rawStr);
+                    matches.forEach(m => {
+                        const val = parseFloat(m.replace(/[^\d.-]/g, ''));
+                        if (!isNaN(val) && !discs.some(d => Math.abs(d - val) < 0.05)) {
+                            const vL = se1(compiled, val - 1e-5);
+                            const vR = se1(compiled, val + 1e-5);
+                            if (!isFinite(vL) || !isFinite(vR) || Math.abs(vL - vR) > 0.1) discs.push(+R(val, 2));
+                        }
+                    });
+                }
+            }
+            return discs.sort((a, b) => a - b);
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // ASYMPTOTES
+        // ──────────────────────────────────────────────────────────
+        function asymptotes(expr, discs) {
+            const r = { hPos: null, hNeg: null, h: null, obl: null };
+
+            function checkAsym(fn, dir) {
+                const s = dir > 0 ? 1 : -1;
+                const v1 = fn(s * 1e6), v2 = fn(s * 2e6), v3 = fn(s * 3e6), v4 = fn(s * 4e6);
+                if (!isFinite(v1) || !isFinite(v2) || !isFinite(v3) || !isFinite(v4)) return null;
+                const minV = Math.min(v1, v2, v3, v4);
+                const maxV = Math.max(v1, v2, v3, v4);
+                if (maxV - minV < 1e-3) return Math.abs(v4) < 1e-5 ? 0 : v4;
+                return null;
+            }
+
+            try {
+                const hp = checkAsym(x => se1(expr, x), 1);
+                const hn = checkAsym(x => se1(expr, x), -1);
+
+                if (hp !== null) r.hPos = R(hp, 3);
+                if (hn !== null) r.hNeg = R(hn, 3);
+
+                if (r.hPos !== null && r.hNeg !== null) {
+                    r.h = r.hPos === r.hNeg ? `y = ${r.hPos}` : `y = ${r.hPos} (x→+∞), y = ${r.hNeg} (x→−∞)`;
+                } else if (r.hPos !== null) r.h = `y = ${r.hPos} (x→+∞)`;
+                else if (r.hNeg !== null) r.h = `y = ${r.hNeg} (x→−∞)`;
+
+                if (r.hPos === null || r.hNeg === null) {
+                    let mPos = null, bPos = null;
+                    if (r.hPos === null) {
+                        mPos = checkAsym(x => se1(expr, x) / x, 1);
+                        if (mPos !== null && Math.abs(mPos) > 1e-4) bPos = checkAsym(x => se1(expr, x) - mPos * x, 1);
+                        else mPos = null;
+                    }
+                    let mNeg = null, bNeg = null;
+                    if (r.hNeg === null) {
+                        mNeg = checkAsym(x => se1(expr, x) / x, -1);
+                        if (mNeg !== null && Math.abs(mNeg) > 1e-4) bNeg = checkAsym(x => se1(expr, x) - mNeg * x, -1);
+                        else mNeg = null;
+                    }
+                    if (mPos !== null && bPos !== null && mNeg !== null && bNeg !== null) {
+                        const m1 = R(mPos, 3), b1 = R(bPos, 3), m2 = R(mNeg, 3), b2 = R(bNeg, 3);
+                        if (m1 === m2 && b1 === b2) r.obl = { m: m1, b: b1, side: '' };
+                        else r.obl = { m: m1, b: b1, side: '(x→±∞ dif)' };
+                    } else if (mPos !== null && bPos !== null) r.obl = { m: R(mPos, 3), b: R(bPos, 3), side: '(x→+∞)' };
+                    else if (mNeg !== null && bNeg !== null) r.obl = { m: R(mNeg, 3), b: R(bNeg, 3), side: '(x→−∞)' };
+                }
+            } catch(e) {}
+            return r;
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // TAYLOR
+        // ──────────────────────────────────────────────────────────
+        function calcTaylor() {
+            if (!s2.expr) return;
+            try {
+                const a = parseFloat(document.getElementById('taylora').value) || 0;
+                const n = parseInt(document.getElementById('taylorN').value) || 3;
+                // Compute derivatives numerically (to handle piecewise and complex expressions)
+                const h = 1e-4;
+                let derivVals = [se1(s2.expr, a)];
+                let tempExpr = s2.expr;
+                for (let k = 1; k <= n; k++) {
+                    try {
+                        // Try symbolic chain
+                        const sym = math.derivative(math.parse(tempExpr), 'x');
+                        derivVals.push(se1(sym.toString(), a));
+                        tempExpr = sym.toString();
+                    } catch {
+                        // Fall back to 5-point numerical derivative
+                        const prevDE = tempExpr;
+                        const fk = x => se1(prevDE, x);
+                        let dv;
+                        const H = Math.pow(h, 1 / Math.max(k, 1)) * 0.01;
+                        dv = (-fk(a + 2 * H) + 8 * fk(a + H) - 8 * fk(a - H) + fk(a - 2 * H)) / (12 * H);
+                        derivVals.push(dv);
+                        break; // Can't chain further
+                    }
+                }
+                // Build polynomial
+                const terms = [];
+                let fact = 1;
+                for (let k = 0; k < derivVals.length; k++) {
+                    if (k > 0) fact *= k;
+                    const c = derivVals[k] / fact;
+                    if (Math.abs(c) < 1e-10) continue;
+                    const cStr = R(c, 5);
+                    if (k === 0) { terms.push(`${cStr}`); }
+                    else if (k === 1) {
+                        const shifted = a === 0 ? 'x' : `(x${a > 0 ? `-${a}` : `+${Math.abs(a)}`})`;
+                        terms.push(`${cStr}${shifted}`);
+                    } else {
+                        const base = a === 0 ? `x^{${k}}` : `(x${a > 0 ? `-${a}` : `+${Math.abs(a)}`})^{${k}}`;
+                        terms.push(`${cStr}${base}`);
+                    }
+                }
+                const poly = terms.join(' + ').replace(/\+ -/g, '- ') || '0';
+                document.getElementById('tayres').innerHTML = `$$P_{${n}}(x) = ${poly}$$\n<div class="text-xs text-base-400 mt-1 font-mono">Expandido en torno a $a=${a}$, con ${derivVals.length - 1} derivadas calculadas.</div>`;
+                mj(document.getElementById('tayres'));
+            } catch (err) { document.getElementById('tayres').innerHTML = `<span class="errm">${err.message}</span>`; }
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // MAIN 2D ANALYSIS
+        // ──────────────────────────────────────────────────────────
+        async function analyze2D() {
+            let raw = document.getElementById('fi2d').value.trim();
+            raw = raw.replace(/\bln\(/g, 'log(');
+
+            const rangemode = document.getElementById('rangemode2d').value;
+            let xMin = parseFloat(document.getElementById('xmin2d').value) || (-5);
+            let xMax = parseFloat(document.getElementById('xmax2d').value) || 5;
+
+            const expr = parsePW(raw);
+
+            if (rangemode === 'auto') {
+                try {
+                    const pts = roots(x => se1(expr, x), -40, 40, 1000);
+                    if (pts.length > 0) {
+                        const minR = Math.min(...pts) - 2;
+                        const maxR = Math.max(...pts) + 2;
+                        xMin = Math.max(-40, minR);
+                        xMax = Math.min(40, maxR);
+                        if (xMax - xMin < 2) { xMin -= 2; xMax += 2; }
+                    } else {
+                        xMin = -10; xMax = 10;
+                    }
+                    document.getElementById('xmin2d').value = R(xMin, 2);
+                    document.getElementById('xmax2d').value = R(xMax, 2);
+                } catch (e) { }
+            } else if (rangemode === 'inf') {
+                xMin = -1e4;
+                xMax = 1e4;
+                document.getElementById('xmin2d').value = xMin;
+                document.getElementById('xmax2d').value = xMax;
+            }
+
+            const errEl = document.getElementById('err2d'), btn = document.getElementById('abtn2d');
+            s2.xMin = xMin; s2.xMax = xMax;
+            errEl.classList.add('hidden'); btn.innerHTML = '<span class="spin"></span>';
+            try { math.parse(expr); se1(expr, 1); } catch (e) { errEl.textContent = '✕ ' + e.message; errEl.classList.remove('hidden'); btn.innerHTML = '⟨ ANALIZAR ⟩'; return; }
+            s2.expr = expr;
+            s2.raw = raw;
+            document.getElementById('fdisplay2d').textContent = `f(x) = ${raw.replace(/log\(/g, 'ln(')}`;
+            const sl = document.getElementById('tanslider');
+            const slideMin = rangemode === 'inf' ? -100 : xMin;
+            const slideMax = rangemode === 'inf' ? 100 : xMax;
+            sl.min = slideMin; sl.max = slideMax; sl.step = (slideMax - slideMin) / 200;
+            if (+sl.value < slideMin || +sl.value > slideMax) sl.value = (slideMin + slideMax) / 2;
+
+            try {
+                let d1Raw = derivePW(raw, 'x');
+                let d2Raw = derivePW(d1Raw, 'x');
+                let d3Raw = derivePW(d2Raw, 'x');
+                s2.d1 = parsePW(d1Raw);
+                s2.d2 = parsePW(d2Raw);
+                s2.d3 = parsePW(d3Raw);
+
+                const fmtPW = s => {
+                    if (!s.includes('si')) return `$$${math.parse(s).toTex({ parenthesis: 'auto' })}$$`;
+                    const cases = s.split(';').map(p => {
+                        const m = p.match(/^(.+?)\s+(?:si|if|cuando|when)\s+(.+)$/i);
+                        if (m) {
+                            try { return `${math.parse(m[1]).toTex({ parenthesis: 'auto' })}, & \\text{si } ${m[2]}`; } catch { return `\\text{Error}, & \\text{si } ${m[2]}`; }
+                        }
+                        try { return `${math.parse(p).toTex({ parenthesis: 'auto' })}, & \\text{en otro caso}`; } catch { return `\\text{Error}`; }
+                    }).join('\\\\');
+                    return `$$\\begin{cases}${cases}\\end{cases}$$`;
+                };
+
+                document.getElementById('d1').innerHTML = raw.includes(';') ? `f'(x):<br>${fmtPW(d1Raw)}` : `$$f'(x)=${math.parse(d1Raw).toTex()}$$`;
+                document.getElementById('d2').innerHTML = raw.includes(';') ? `f''(x):<br>${fmtPW(d2Raw)}` : `$$f''(x)=${math.parse(d2Raw).toTex()}$$`;
+                document.getElementById('d3').innerHTML = raw.includes(';') ? `f'''(x):<br>${fmtPW(d3Raw)}` : `$$f'''(x)=${math.parse(d3Raw).toTex()}$$`;
+                for (const id of ['d1', 'd2', 'd3']) await mj(document.getElementById(id));
+            } catch (e) { document.getElementById('d1').innerHTML = `<span class="errm">${e.message}</span>`; s2.d1 = s2.d2 = s2.d3 = null; }
+
+            const discs = domainDisc(s2.raw || s2.expr);
+            document.getElementById('dom').innerHTML = discs.length === 0 ? '$$\\mathbb{R}$$' : `$$\\mathbb{R}\\setminus\\{${discs.join(',')}\\}$$`;
+            await mj(document.getElementById('dom'));
+            document.getElementById('disc').innerHTML = discs.length === 0 ? '<span class="tag tn">Ninguna</span>' : discs.map(p => `<span class="tag tp">x = ${p}</span>`).join(' ');
+
+            if (s2.d1 && s2.d2) {
+                const d1s = s2.d1.toString(), d2s = s2.d2.toString();
+                const searchMin = Math.max(xMin, -200), searchMax = Math.min(xMax, 200);
+                const cps = roots(x => se1(d1s, x), searchMin, searchMax, 3000);
+                const ips = roots(x => se1(d2s, x), searchMin, searchMax, 3000);
+
+                const validCps = cps.filter(x => !discs.some(d => Math.abs(d - x) < 0.1));
+                const validIps = ips.filter(x => !discs.some(d => Math.abs(d - x) < 0.1));
+
+                document.getElementById('crit').innerHTML = validCps.length > 0
+                    ? validCps.map(x => {
+                        const fx = R(se1(expr, x), 4);
+                        const d2x = se1(d2s, x);
+                        const lbl = Math.abs(d2x) < 1e-5 ? '? (D2=0)' : d2x > 0 ? '▲ mínimo local' : '▼ máximo local';
+                        const cls = Math.abs(d2x) < 1e-5 ? 'ts' : d2x > 0 ? 'tn' : 'tp';
+                        return `<span class="tag ${cls}">x=${x} → f=${fx} [${lbl}]</span>`;
+                    }).join('<br>')
+                    : '<span class="tag ts">Ninguno encontrado</span>';
+
+                document.getElementById('infl').innerHTML = validIps.length > 0
+                    ? validIps.map(x => {
+                        const fx = R(se1(expr, x), 4);
+                        const d3x = s2.d3 ? se1(s2.d3.toString(), x) : NaN;
+                        const confirmed = isFinite(d3x) && Math.abs(d3x) > 1e-5 ? ' ✓' : ' (verificar)';
+                        return `<span class="tag tv">x=${x} → f=${fx}${confirmed}</span>`;
+                    }).join('<br>')
+                    : '<span class="tag ts">Ninguno encontrado</span>';
+
+                const allBreaks = [...new Set([searchMin, ...validCps, ...discs.filter(d => d > searchMin && d < searchMax), searchMax])].sort((a, b) => a - b);
+                const inc = [], dec = [];
+                for (let i = 0; i < allBreaks.length - 1; i++) {
+                    const lo = allBreaks[i], hi = allBreaks[i + 1];
+                    if (hi - lo < 1e-4) continue;
+                    const mid = (lo + hi) / 2;
+                    if (discs.some(d => Math.abs(d - mid) < 0.5)) continue;
+                    const v = se1(d1s, mid);
+                    if (!isFinite(v)) continue;
+                    const iv = `(${R(lo, 3)}, ${R(hi, 3)})`;
+                    v > 1e-8 ? inc.push(iv) : v < -1e-8 ? dec.push(iv) : null;
+                }
+
+                const allBreaks2 = [...new Set([searchMin, ...validIps, ...discs.filter(d => d > searchMin && d < searchMax), searchMax])].sort((a, b) => a - b);
+                const cu = [], cd = [];
+                for (let i = 0; i < allBreaks2.length - 1; i++) {
+                    const lo = allBreaks2[i], hi = allBreaks2[i + 1];
+                    if (hi - lo < 1e-4) continue;
+                    const mid = (lo + hi) / 2;
+                    if (discs.some(d => Math.abs(d - mid) < 0.5)) continue;
+                    const v = se1(d2s, mid);
+                    if (!isFinite(v)) continue;
+                    const iv = `(${R(lo, 3)}, ${R(hi, 3)})`;
+                    v > 1e-8 ? cu.push(iv) : v < -1e-8 ? cd.push(iv) : null;
+                }
+
+                document.getElementById('inc').innerHTML = inc.length ? inc.join(', ') : '<span class="tag ts">No encontrado</span>';
+                document.getElementById('dec').innerHTML = dec.length ? dec.join(', ') : '<span class="tag ts">No encontrado</span>';
+                document.getElementById('cu').innerHTML = cu.length ? cu.join(', ') : '<span class="tag ts">No encontrado</span>';
+                document.getElementById('cd').innerHTML = cd.length ? cd.join(', ') : '<span class="tag ts">No encontrado</span>';
+            }
+
+            const spanSearch = Math.min(Math.abs(xMin), Math.abs(xMax)) > 50 ? 100 : Math.max(Math.abs(xMin), Math.abs(xMax), 20);
+            const f0 = se1(expr, 0);
+            let cortesX = roots(x => se1(expr, x), -spanSearch, spanSearch, 3000);
+            cortesX = cortesX.filter(x => !discs.some(d => Math.abs(d - x) < 0.1));
+            const corXhtml = cortesX.length
+                ? cortesX.map(v => `<span class="tag ts">(${v}, 0)</span>`).join(' ')
+                : '<span class="tag tv">Ninguno encontrado en [-' + spanSearch + ',' + spanSearch + ']</span>';
+            const corYhtml = isFinite(f0) ? `<span class="tag tn">(0, ${R(f0, 5)})</span>` : '<span class="tag tp">∄ (discontinuidad en x=0)</span>';
+            document.getElementById('cortes2d').innerHTML =
+                `<div class="mb-1"><b class="text-base-400 text-xs font-mono">EJE Y:</b> ${corYhtml}</div><div><b class="text-base-400 text-xs font-mono">EJE X:</b> ${corXhtml}</div>`;
+
+            let isEven = true, isOdd = true;
+            for (let x of [1.27, 2.71, 4.13]) {
+                const p = se1(expr, x), m = se1(expr, -x);
+                if (!isFinite(p) || !isFinite(m)) continue;
+                if (Math.abs(p - m) > 1e-3) isEven = false;
+                if (Math.abs(p + m) > 1e-3) isOdd = false;
+            }
+            if (isEven && !isOdd) document.getElementById('paridad2d').innerHTML = '<span class="tag tn">Función PAR (Simetría eje Y)</span> f(x) = f(-x)';
+            else if (isOdd && !isEven) document.getElementById('paridad2d').innerHTML = '<span class="tag ts">Función IMPAR (Simetría Origen)</span> f(-x) = -f(x)';
+            else document.getElementById('paridad2d').innerHTML = '<span class="tag tv">Sin paridad especial</span>';
+
+            const asym = asymptotes(expr, discs);
+            document.getElementById('asv').innerHTML = discs.length > 0 ? discs.map(x => `<span class="tag tp">x=${x}</span>`).join(' ') : '<span class="tag tn">No hay</span>';
+            document.getElementById('ash').innerHTML = asym.h !== null ? `<span class="tag tv">${asym.h}</span>` : '<span class="tag tn">No hay</span>';
+            if (asym.obl) {
+                const bg = asym.obl.b >= 0 ? `+ ${asym.obl.b}` : `- ${Math.abs(asym.obl.b)}`;
+                document.getElementById('aso').innerHTML = `<span class="tag tg">y = ${asym.obl.m}x ${bg} ${asym.obl.side}</span>`;
+            } else {
+                document.getElementById('aso').innerHTML = '<span class="tag tn">No hay</span>';
+            }
+
+            let integralSymbolic = "No disponible o función analizada mediante componentes numéricos.";
+            if (window.nerdamer && !raw.includes('si')) {
+                try {
+                    integralSymbolic = nerdamer('integrate(' + raw + ', x)').toTeX();
+                    integralSymbolic = `$$ \\int f(x)dx = ${integralSymbolic} + C $$`;
+                } catch (ex) { integralSymbolic = `<span class="tag tv text-xs">No resoluble analíticamente</span>`; }
+            }
+            document.getElementById('intsym').innerHTML = integralSymbolic;
+            if (integralSymbolic.includes('$$')) mj(document.getElementById('intsym'));
+
+            const spanA = xMin === -1e4 ? -50 : xMin; const spanB = xMax === 1e4 ? 50 : xMax;
+            const iv = simpson(x => se1(expr, x), spanA, spanB);
+            document.getElementById('intrange').innerHTML = `Aproximación de <span class="text-neon">x=${spanA}</span> a <span class="text-neon">x=${spanB}</span>`;
+            document.getElementById('intval').textContent = iv !== null && isFinite(iv) ? `≈ ${R(iv, 6)}` : 'Diverge en rango evaluado';
+            document.getElementById('intval').style.color = iv !== null && isFinite(iv) ? '#00F5A0' : '#FF6B6B';
+
+            buildVT(expr, spanA, spanB);
+            buildChart2D(expr, xMin, xMax, +document.getElementById('tanslider').value, discs, asym, rangemode);
+            tangentSlide(+document.getElementById('tanslider').value);
+            btn.innerHTML = '⟨ ANALIZAR ⟩';
+        }
+
+        function buildVT(expr, xMin, xMax) {
+            const h = (xMax - xMin) / 10;
+            const d1s = s2.d1?.toString(), d2s = s2.d2?.toString();
+            let html = '';
+            for (let i = 0; i <= 10; i++) {
+                const x = R(xMin + i * h, 3), fx = R(se1(expr, x), 4), d1x = d1s ? R(se1(d1s, x), 4) : '—', d2x = d2s ? R(se1(d2s, x), 4) : '—';
+                const mono = d1s ? (se1(d1s, x) > 0 ? '<span class="tag tn">↑</span>' : '<span class="tag tp">↓</span>') : '—';
+                const curv = d2s ? (se1(d2s, x) > 0 ? '<span class="tag ts">∪</span>' : '<span class="tag tv">∩</span>') : '—';
+                html += `<tr class="border-b border-base-700/30 hover:bg-base-700/20 transition-colors"><td class="py-1.5 px-3 text-neon">${x}</td><td class="py-1.5 px-3 text-right text-base-300">${isNaN(fx) ? '∄' : fx}</td><td class="py-1.5 px-3 text-right text-base-300">${d1x}</td><td class="py-1.5 px-3 text-right text-base-300">${d2x}</td><td class="py-1.5 px-3 text-right">${mono}</td><td class="py-1.5 px-3 text-right">${curv}</td></tr>`;
+            }
+            document.getElementById('vtbody').innerHTML = html;
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // MAIN 3D ANALYSIS
+        // ──────────────────────────────────────────────────────────
+        async function analyze3D() {
+            let raw = document.getElementById('fi3d').value.trim();
+            raw = raw.replace(/\bln\(/g, 'log(');
+
+            const rangemode = document.getElementById('rangemode3d').value;
+            let xMin = parseFloat(document.getElementById('xmin3d').value) || (-3);
+            let xMax = parseFloat(document.getElementById('xmax3d').value) || 3;
+            let yMin = parseFloat(document.getElementById('ymin3d').value) || (-3);
+            let yMax = parseFloat(document.getElementById('ymax3d').value) || 3;
+
+            if (rangemode === 'auto') {
+                xMin = -5; xMax = 5;
+                yMin = -5; yMax = 5;
+                document.getElementById('xmin3d').value = xMin;
+                document.getElementById('xmax3d').value = xMax;
+                document.getElementById('ymin3d').value = yMin;
+                document.getElementById('ymax3d').value = yMax;
+            } else if (rangemode === 'inf') {
+                xMin = -100; xMax = 100;
+                yMin = -100; yMax = 100;
+                document.getElementById('xmin3d').value = '-∞';
+                document.getElementById('xmax3d').value = '∞';
+                document.getElementById('ymin3d').value = '-∞';
+                document.getElementById('ymax3d').value = '∞';
+            }
+
+            const errEl = document.getElementById('err3d'), btn = document.getElementById('abtn3d');
+            s3.xMin = xMin; s3.xMax = xMax; s3.yMin = yMin; s3.yMax = yMax;
+            errEl.classList.add('hidden'); btn.innerHTML = '<span class="spin"></span>';
+            try { math.parse(raw); se2(raw, 1, 1); } catch (e) { errEl.textContent = '✕ ' + e.message; errEl.classList.remove('hidden'); btn.innerHTML = '⟨ CALCULAR ⟩'; return; }
+            s3.expr = raw;
+            document.getElementById('fdisplay3d').textContent = `f(x,y) = ${raw.replace(/log\(/g, 'ln(')}`;
+            document.getElementById('pxsl').min = rangemode === 'inf' ? -50 : xMin; document.getElementById('pxsl').max = rangemode === 'inf' ? 50 : xMax;
+            document.getElementById('pysl').min = rangemode === 'inf' ? -50 : yMin; document.getElementById('pysl').max = rangemode === 'inf' ? 50 : yMax;
+
+            try {
+                const fxn = math.simplify(math.derivative(math.parse(raw), 'x'));
+                const fyn = math.simplify(math.derivative(math.parse(raw), 'y'));
+                s3.fx = fxn; s3.fy = fyn;
+                const fxxn = math.simplify(math.derivative(fxn, 'x'));
+                const fyyn = math.simplify(math.derivative(fyn, 'y'));
+                const fxyn = math.simplify(math.derivative(fxn, 'y'));
+                s3.fxx = fxxn; s3.fyy = fyyn; s3.fxy = fxyn;
+                const fxt = ntl(fxn), fyt = ntl(fyn), fxxt = ntl(fxxn), fyyt = ntl(fyyn), fxyt = ntl(fxyn);
+                document.getElementById('pfxsym').innerHTML = `$$f_x=${fxt}$$`;
+                document.getElementById('pfysym').innerHTML = `$$f_y=${fyt}$$`;
+                document.getElementById('grad3d').innerHTML = `$$\\nabla f=(${fxt})\\hat{i}+(${fyt})\\hat{j}$$`;
+                document.getElementById('fxx3d').innerHTML = `$$f_{xx}=${fxxt},\\;f_{yy}=${fyyt},\\;f_{xy}=${fxyt}$$`;
+                document.getElementById('hesmat').innerHTML = `$$H=\\begin{pmatrix}${fxxt}&${fxyt}\\\\${fxyt}&${fyyt}\\end{pmatrix}$$`;
+                document.getElementById('hesdet').innerHTML = `$$D = f_{xx}\\cdot f_{yy} - f_{xy}^2 = ${fxxt}\\cdot${fyyt}-(${fxyt})^2$$`;
+
+                document.getElementById('jacobscalar').innerHTML = `$$J_f = \\begin{pmatrix}${fxt} & ${fyt}\\end{pmatrix}$$`;
+                for (const id of ['pfxsym', 'pfysym', 'grad3d', 'fxx3d', 'hesmat', 'hesdet', 'jacobscalar']) await mj(document.getElementById(id));
+
+                const cpts = findCrit3D(raw, xMin, xMax, yMin, yMax);
+                if (cpts.length > 0) {
+                    let ch = '', cl = '', hnum = '';
+                    for (const { x, y } of cpts) {
+                        const fz = R(se2(raw, x, y), 4);
+                        const fxxv = se2(fxxn.toString(), x, y);
+                        const fyyv = se2(fyyn.toString(), x, y);
+                        const fxyv = se2(fxyn.toString(), x, y);
+                        const D = fxxv * fyyv - fxyv * fxyv;
+                        const Dnum = R(D, 6);
+                        const [type, cls] = !isFinite(D) ? ['Indeter.', 'ts']
+                            : D > 0 && fxxv > 0 ? ['▲ Mínimo local', 'tn']
+                                : D > 0 && fxxv < 0 ? ['▼ Máximo local', 'tp']
+                                    : D < 0 ? ['⬡ Punto de Silla', 'tg']
+                                        : ['D=0 (inconcluso)', 'ts'];
+                        ch += `<span class="tag tv">x=${x}, y=${y}, f=${fz}</span> `;
+                        cl += `<span class="tag ${cls}">(${x},${y}) → ${type}</span> det(H)=${Dnum}<br>`;
+                        hnum += `<span class="tag ts">(${x},${y})</span> ` +
+                            `<span class="font-mono text-xs" style="color:#FCD34D">D = f_xx·f_yy - f_xy² = ${R(fxxv, 4)}·${R(fyyv, 4)} - (${R(fxyv, 4)})² = <b style="color:#00F5A0">${Dnum}</b></span><br>`;
+                    }
+                    document.getElementById('crit3d').innerHTML = ch;
+                    document.getElementById('class3d').innerHTML = cl;
+                    document.getElementById('hesdetnum').innerHTML = hnum;
+                    document.getElementById('optlist').innerHTML = cl;
+                } else {
+                    const msg = '<span class="tag ts">Ninguno en rango</span>';
+                    document.getElementById('crit3d').innerHTML = msg;
+                    document.getElementById('class3d').innerHTML = msg;
+                    document.getElementById('optlist').innerHTML = msg;
+                }
+            } catch (e) {
+                document.getElementById('pfxsym').innerHTML = `<span class="errm">${e.message}</span>`;
+                s3.fx = s3.fy = null;
+            }
+
+            const px0 = parseFloat(document.getElementById('pxnum')?.value || document.getElementById('pxsl').value) || 0;
+            const py0 = parseFloat(document.getElementById('pynum')?.value || document.getElementById('pysl').value) || 0;
+            if (s3.fx && s3.fy) {
+                const jx = R(se2(s3.fx.toString(), px0, py0), 4);
+                const jy = R(se2(s3.fy.toString(), px0, py0), 4);
+                document.getElementById('jacobscalarnum').innerHTML =
+                    `En (${px0}, ${py0}): <span class="font-mono" style="color:#00F5A0">J_f = [${jx}, ${jy}]</span>`;
+            }
+
+            const f00 = se2(raw, 0, 0);
+            document.getElementById('cortesz3d').innerHTML = isFinite(f00) ? `(0, 0, ${R(f00, 4)})` : '∄';
+
+            let isPar = true, isImpar = true;
+            for (let pt of [[1.13, 1.37], [2.21, -1.89], [-1.57, 3.14]]) {
+                const [x, y] = pt;
+                const p = se2(raw, x, y), m = se2(raw, -x, -y);
+                if (!isFinite(p) || !isFinite(m)) continue;
+                if (Math.abs(p - m) > 1e-4) isPar = false;
+                if (Math.abs(p + m) > 1e-4) isImpar = false;
+            }
+            if (isPar && !isImpar) document.getElementById('paridad3d').innerHTML = '<span class="tag tn">Simetría PAR en origen</span> f(x,y) = f(-x,-y)';
+            else if (isImpar && !isPar) document.getElementById('paridad3d').innerHTML = '<span class="tag ts">Simetría IMPAR en origen</span> f(x,y) = -f(-x,-y)';
+            else document.getElementById('paridad3d').innerHTML = '<span class="tag tv">Sin paridad especial</span>';
+
+            const px = parseFloat(document.getElementById('pxsl').value) || 0;
+            const py = parseFloat(document.getElementById('pysl').value) || 0;
+            build3D(raw, xMin, xMax, yMin, yMax, px, py, rangemode);
+            updateProbe();
+            btn.innerHTML = '⟨ CALCULAR ⟩';
+        }
+
+        function findCrit3D(expr, x0, x1, y0, y1) {
+            if (!s3.fx || !s3.fy) return [];
+            const fxs = s3.fx.toString(), fys = s3.fy.toString();
+            const N = 18, hx = (x1 - x0) / N, hy = (y1 - y0) / N, cands = [];
+            for (let i = 0; i <= N; i++) for (let j = 0; j <= N; j++) {
+                let cx = x0 + i * hx, cy = y0 + j * hy;
+                if (Math.abs(se2(fxs, cx, cy)) < .5 && Math.abs(se2(fys, cx, cy)) < .5) {
+                    for (let k = 0; k < 50; k++) {
+                        const gx = se2(fxs, cx, cy), gy = se2(fys, cx, cy);
+                        if (!isFinite(gx) || !isFinite(gy)) break;
+                        const mag = Math.sqrt(gx * gx + gy * gy); if (mag < 1e-8) break;
+                        cx -= 0.01 * gx; cy -= 0.01 * gy;
+                    }
+                    cx = R(cx, 3); cy = R(cy, 3);
+                    if (!cands.some(p => Math.abs(p.x - cx) < .1 && Math.abs(p.y - cy) < .1)) {
+                        if (Math.abs(se2(fxs, cx, cy)) < .05 && Math.abs(se2(fys, cx, cy)) < .05) cands.push({ x: cx, y: cy });
+                    }
+                }
+            }
+            return cands;
+        }
+
+        // Probe
+        function updateProbe() {
+            if (!s3.expr) return;
+            const x0 = parseFloat(document.getElementById('pxsl').value);
+            const y0 = parseFloat(document.getElementById('pysl').value);
+            document.getElementById('pxval').textContent = R(x0, 2);
+            document.getElementById('pyval').textContent = R(y0, 2);
+            const fz = se2(s3.expr, x0, y0), fxv = ndx(s3.expr, x0, y0), fyv = ndy(s3.expr, x0, y0);
+            const gm = Math.sqrt(fxv ** 2 + fyv ** 2);
+            document.getElementById('pfval').textContent = isFinite(fz) ? R(fz, 5) : '∄';
+            document.getElementById('pfx').textContent = isFinite(fxv) ? R(fxv, 5) : '∄';
+            document.getElementById('pfy').textContent = isFinite(fyv) ? R(fyv, 5) : '∄';
+            document.getElementById('pgm').textContent = isFinite(gm) ? R(gm, 5) : '∄';
+            if (isFinite(fz) && isFinite(fxv) && isFinite(fyv)) {
+                const b = R(fz - fxv * x0 - fyv * y0, 4), sg = b >= 0 ? `+${b}` : `${b}`;
+                document.getElementById('tanplane').innerHTML = `$$z=${R(fxv, 4)}x+${R(fyv, 4)}y${sg}$$`;
+                document.getElementById('normvec').innerHTML = `$$\\vec{n}=(${R(-fxv, 4)},\\,${R(-fyv, 4)},\\,1)$$`;
+                document.getElementById('linear3d').innerHTML = `$$L(x,y)\\approx f(${x0},${y0})+f_x(x-${x0})+f_y(y-${y0})$$`;
+                mj(document.getElementById('tanplane'));
+                mj(document.getElementById('normvec'));
+                mj(document.getElementById('linear3d'));
+            }
+            build3D(s3.expr, s3.xMin, s3.xMax, s3.yMin, s3.yMax, x0, y0, document.getElementById('rangemode3d')?.value);
+        }
+
+        // Limits 3D
+        function analyzeLim3D() {
+            if (!s3.expr) return;
+            const x0 = parseFloat(document.getElementById('limx0').value) || 0;
+            const y0 = parseFloat(document.getElementById('limy0').value) || 0;
+            const eps = 1e-6, fmt = v => isFinite(v) ? R(v, 6) : v > 0 ? '+∞' : '−∞';
+            const lxp = se2(s3.expr, x0 + eps, y0), lxn = se2(s3.expr, x0 - eps, y0);
+            const lyp = se2(s3.expr, x0, y0 + eps), lyn = se2(s3.expr, x0, y0 - eps);
+            const ld = Math.abs(x0 - y0) < 1e-4 ? se2(s3.expr, x0 + eps, x0 + eps) : null;
+            const lp = se2(s3.expr, x0 + eps, (x0 + eps) ** 2);
+            document.getElementById('limx').textContent = `lím f(x,${y0}) ≈ ${fmt(lxp)} (+) / ${fmt(lxn)} (-)`;
+            document.getElementById('limy').textContent = `lím f(${x0},y) ≈ ${fmt(lyp)} (+) / ${fmt(lyn)} (-)`;
+            document.getElementById('limd').textContent = ld !== null ? `por y=x: ≈ ${fmt(ld)}` : 'N/A (x₀≠y₀)';
+            document.getElementById('limp').textContent = `por y=x²: ≈ ${fmt(lp)}`;
+            const vals = [lxp, lxn, lyp, lyn].filter(v => isFinite(v));
+            const ok = vals.length > 0 && vals.every(v => Math.abs(v - vals[0]) < 1e-3);
+            document.getElementById('limc').innerHTML = ok
+                ? `<span class="tag tn">✓ Trayectorias convergen ≈ ${fmt(vals[0])}</span>`
+                : '<span class="tag tp">✗ Trayectorias divergen — límite posiblemente ∄</span>';
+        }
+
+        // Vector field
+        async function analyzeVF() {
+            const P = document.getElementById('vecP').value.trim(), Q = document.getElementById('vecQ').value.trim();
+            if (!P || !Q) return;
+            document.getElementById('vfdisp').innerHTML = `$$\\vec{F}=(${fl(P)})\\hat{i}+(${fl(Q)})\\hat{j}$$`;
+            try {
+                const dPdx = math.simplify(math.derivative(math.parse(P), 'x'));
+                const dQdy = math.simplify(math.derivative(math.parse(Q), 'y'));
+                const dQdx = math.simplify(math.derivative(math.parse(Q), 'x'));
+                const dPdy = math.simplify(math.derivative(math.parse(P), 'y'));
+                document.getElementById('diverg').innerHTML = `$$\\nabla\\cdot\\vec{F}=${ntl(dPdx)}+${ntl(dQdy)}$$`;
+                document.getElementById('curl3d').innerHTML = `$$(\\nabla\\times\\vec{F})\\cdot\\hat{k}=${ntl(dQdx)}-(${ntl(dPdy)})$$`;
+                const curlAt0 = se2(dQdx.toString() + '-' + dPdy.toString(), 0, 0);
+                const divAt0 = se2(dPdx.toString() + '+' + dQdy.toString(), 0, 0);
+                let ft = '';
+                if (Math.abs(curlAt0) < 0.01) ft += `<span class="tag tn">Campo Conservativo (∇×F≈0)</span> `;
+                if (Math.abs(divAt0) < 0.01) ft += `<span class="tag ts">Campo Solenoidal (∇·F≈0)</span>`;
+                if (!ft) ft = '<span class="tag tv">Campo General</span>';
+                document.getElementById('ftype').innerHTML = ft;
+
+                document.getElementById('jacob3d').innerHTML = `$$J=\\begin{pmatrix}${ntl(dPdx)}&${ntl(dPdy)}\\\\${ntl(dQdx)}&${ntl(dQdy)}\\end{pmatrix}$$`;
+                document.getElementById('jacobdet3d').innerHTML = `$$det(J) = (${ntl(dPdx)})\\cdot(${ntl(dQdy)}) - (${ntl(dPdy)})\\cdot(${ntl(dQdx)})$$`;
+                mj(document.getElementById('jacob3d')); mj(document.getElementById('jacobdet3d'));
+
+                for (const id of ['vfdisp', 'diverg', 'curl3d']) await mj(document.getElementById(id));
+                document.getElementById('fdisplay3d').textContent = `F = (${P})î + (${Q})ĵ`;
+                // Draw cones
+                const xs = rng(s3.xMin || (-3), s3.xMax || 3, 10), ys = rng(s3.yMin || (-3), s3.yMax || 3, 10);
+                const vx = [], vy = [], vz = [], u = [], v2 = [], w = [];
+                xs.forEach(x => ys.forEach(y => { const p = se2(P, x, y), q = se2(Q, x, y); if (isFinite(p) && isFinite(q)) { vx.push(x); vy.push(y); vz.push(0); u.push(p); v2.push(q); w.push(0); } }));
+                const traces = [{ type: 'cone', x: vx, y: vy, z: vz, u, v: v2, w, colorscale: [[0, '#00F5A0'], [1, '#FF6B6B']], showscale: false, sizemode: 'absolute', sizeref: .5, hovertemplate: 'P=%{u:.3f}<br>Q=%{v:.3f}<extra></extra>' }];
+                const layout = { paper_bgcolor: '#080C18', scene: { xaxis: { color: '#4A5568', backgroundcolor: '#04060E', showbackground: true, title: 'x' }, yaxis: { color: '#4A5568', backgroundcolor: '#04060E', showbackground: true, title: 'y' }, zaxis: { color: '#4A5568', backgroundcolor: '#04060E', showbackground: true, title: '' }, bgcolor: '#04060E' }, margin: { t: 15, r: 0, b: 15, l: 0 } };
+                plt3init ? Plotly.react('plt3d', traces, layout, { displayModeBar: true, displaylogo: false, responsive: true }) : Plotly.newPlot('plt3d', traces, layout, { displayModeBar: true, displaylogo: false, responsive: true });
+                plt3init = true;
+            } catch (e) { document.getElementById('diverg').innerHTML = `<span class="errm">${e.message}</span>`; }
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // ──────────────────────────────────────────────────────────
+        function toggleRange2D() {
+            const mode = document.getElementById('rangemode2d').value;
+            document.getElementById('xmin2d').disabled = mode !== 'manual';
+            document.getElementById('xmax2d').disabled = mode !== 'manual';
+            analyze2D();
+        }
+
+        function toggleRange3D() {
+            const mode = document.getElementById('rangemode3d').value;
+            document.getElementById('xmin3d').disabled = mode !== 'manual';
+            document.getElementById('xmax3d').disabled = mode !== 'manual';
+            document.getElementById('ymin3d').disabled = mode !== 'manual';
+            document.getElementById('ymax3d').disabled = mode !== 'manual';
+            analyze3D();
+        }
+
+        function showTheory(title, texContent) {
+            document.getElementById('mTitle').innerHTML = title;
+            document.getElementById('mDesc').innerHTML = texContent.replace(/\n/g, '<br>');
+            document.getElementById('infoModal').classList.add('active');
+            if (texContent.includes('$')) setTimeout(() => mj(document.getElementById('mDesc')), 50);
+        }
+
+        function closeTheory(e) {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        document.getElementById('fi2d').addEventListener('keydown', e => { if (e.key === 'Enter') analyze2D(); });
+
+        window.addEventListener('load', () => setTimeout(analyze2D, 900));
+
+        // PWA Service Worker Estratégico (100% Offline & Stale-While-Revalidate)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'mathlab-offline-v3.0';
+                
+                // Archivos críticos a retener en la instalación inicial (CDNs)
+                const PRECACHE = [
+                    './',
+                    'https://cdn.tailwindcss.com',
+                    'https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.js',
+                    'https://cdn.plot.ly/plotly-2.27.0.min.js',
+                    'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/nerdamer.core.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Algebra.js',
+                    'https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/Calculus.js'
+                ];
+
+                self.addEventListener('install', e => {
+                    self.skipWaiting();
+                    e.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => {
+                            return Promise.allSettled(
+                                PRECACHE.map(url => cache.add(new Request(url, { mode: 'no-cors' })))
+                            );
+                        })
+                    );
+                });
+
+                self.addEventListener('activate', e => {
+                    e.waitUntil(
+                        caches.keys().then(keys => Promise.all(
+                            keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+                        )).then(() => self.clients.claim())
+                    );
+                });
+
+                self.addEventListener('fetch', e => {
+                    const req = e.request;
+                    e.respondWith(
+                        caches.match(req).then(cachedRes => {
+                            const netFetch = fetch(req).then(netRes => {
+                                if (netRes && netRes.status === 200 && netRes.type !== 'error') {
+                                    const resClone = netRes.clone();
+                                    caches.open(CACHE_NAME).then(c => c.put(req, resClone));
+                                }
+                                return netRes;
+                            }).catch(() => null);
+                            
+                            // Stale-while-revalidate: devuelve caché de inmediato, actualiza en fondo.
+                            // Si no hay caché, espera al network.
+                            return cachedRes || netFetch;
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).then(() => {
+                console.log('✅ Service Worker listo. MathLab Pro es 100% Offline.');
+            });
+        }
+    </script>
+</body>
+
+</html>
